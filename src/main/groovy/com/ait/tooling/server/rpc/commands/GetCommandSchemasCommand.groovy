@@ -51,6 +51,6 @@ public class GetCommandSchemasCommand extends JSONCommandSupport implements RPCT
                 return json([error: auth.getText(), command: command.getName()])
             }
         }
-        json()
+        json([error: 'Not found', command: command.getName()])
     }
 }

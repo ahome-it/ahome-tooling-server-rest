@@ -20,7 +20,7 @@ SNAPSHOT:
 <dependency>
   <groupId>com.ahome-it</groupId>
   <artifactId>ahome-tooling-server-rpc</artifactId>
-  <version>1.0.3-SNAPSHOT</version>
+  <version>1.0.19-SNAPSHOT</version>
 </dependency>
 ```
 
