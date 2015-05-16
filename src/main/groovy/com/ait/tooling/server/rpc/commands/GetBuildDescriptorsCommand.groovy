@@ -21,36 +21,18 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.json.JSONObject
-import com.ait.tooling.server.core.security.AuthorizationResult
 import com.ait.tooling.server.core.security.Authorized
-import com.ait.tooling.server.rpc.IJSONCommand
 import com.ait.tooling.server.rpc.IJSONRequestContext
 import com.ait.tooling.server.rpc.JSONCommandSupport
 
 @Service
 @Authorized
 @CompileStatic
-public class GetCommandDictionaryCommand extends JSONCommandSupport
+public class GetBuildDescriptorsCommand extends JSONCommandSupport
 {
     @Override
     public JSONObject execute(final IJSONRequestContext context, final JSONObject object) throws Exception
     {
-        final List list = []
-
-        final JSONObject principals = context.getUserPrincipals()
-
-        getCommandRegistry().getCommands().each { IJSONCommand command ->
-
-            if (command)
-            {
-                final AuthorizationResult auth = getAuthorizationProvider().isAuthorized(command, principals)
-
-                if ((auth) && (auth.isAuthorized()))
-                {
-                    list << command.getCommandMetaData()
-                }
-            }
-        }
-        json(list)
+        json(context.getServerContext().getBuildDescriptorProvider().getBuildDescriptorsAsJSONArray())
     }
 }
