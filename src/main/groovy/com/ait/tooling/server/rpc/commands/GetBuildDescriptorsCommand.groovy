@@ -33,6 +33,6 @@ public class GetBuildDescriptorsCommand extends JSONCommandSupport
     @Override
     public JSONObject execute(final IJSONRequestContext context, final JSONObject object) throws Exception
     {
-        json(context.getServerContext().getBuildDescriptorProvider().getBuildDescriptorsAsJSONArray())
+        json(getBuildDescriptorProvider().getBuildDescriptorsAsJSONArray())
     }
 }
