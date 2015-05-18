@@ -193,7 +193,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
     protected boolean isRunning()
     {
-        return getRPCContext().getServerManager().isRunning();
+        return getRPCContext().getCoreServerManager().isRunning();
     }
 
     protected final IRPCContext getRPCContext()
