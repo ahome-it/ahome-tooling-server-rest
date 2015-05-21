@@ -23,10 +23,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.ait.tooling.json.JSONObject;
+import com.ait.tooling.json.schema.JSONSchema;
 import com.ait.tooling.server.core.jmx.management.ICoreServerManager;
 import com.ait.tooling.server.core.pubsub.IPubSubDescriptorProvider;
 import com.ait.tooling.server.core.pubsub.IPubSubHandlerRegistration;
@@ -47,6 +48,8 @@ public final class RPCContextInstance implements IRPCContext
 {
     private static final long               serialVersionUID = 4505110067047624617L;
 
+    private static final Logger             logger           = Logger.getLogger(RPCContextInstance.class);
+
     private static final RPCContextInstance INSTANCE         = new RPCContextInstance();
 
     public static final RPCContextInstance get()
@@ -65,7 +68,7 @@ public final class RPCContextInstance implements IRPCContext
     }
 
     @Override
-    public WebApplicationContext getApplicationContext()
+    public ApplicationContext getApplicationContext()
     {
         return getServerContext().getApplicationContext();
     }
@@ -187,7 +190,7 @@ public final class RPCContextInstance implements IRPCContext
     @Override
     public Logger logger()
     {
-        return getServerContext().logger();
+        return logger;
     }
 
     @Override
@@ -218,5 +221,17 @@ public final class RPCContextInstance implements IRPCContext
     public JSONObject json(List<?> list)
     {
         return getServerContext().json(list);
+    }
+
+    @Override
+    public JSONSchema jsonschema(Map<String, ?> schema)
+    {
+        return getServerContext().jsonschema(schema);
+    }
+
+    @Override
+    public String uuid()
+    {
+        return getServerContext().uuid();
     }
 }

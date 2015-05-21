@@ -77,12 +77,12 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     @Override
     public JSONSchema getRequestSchema()
     {
-        schema([title: getName(), description: 'Request Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonschema([title: getName(), description: 'Request Schema for ' + getName(), type: 'object', properties: [:]])
     }
 
     @Override
     public JSONSchema getResponseSchema()
     {
-        schema([title: getName(), description: 'Response Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonschema([title: getName(), description: 'Response Schema for ' + getName(), type: 'object', properties: [:]])
     }
 }

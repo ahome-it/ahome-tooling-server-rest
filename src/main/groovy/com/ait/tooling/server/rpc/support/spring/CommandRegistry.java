@@ -16,6 +16,7 @@
 
 package com.ait.tooling.server.rpc.support.spring;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -26,6 +27,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.support.DefaultListableBeanFactory;
+import org.springframework.jmx.export.annotation.ManagedAttribute;
+import org.springframework.jmx.export.annotation.ManagedResource;
 
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.server.rpc.IJSONCommand;
@@ -33,6 +36,7 @@ import com.ait.tooling.server.rpc.IJSONCommand;
 /**
  * CommandRegistry - Registry of all IJSONCommand services found in the application.
  */
+@ManagedResource(objectName = "com.ait.tooling.server.rpc.support.spring:name=CommandRegistry", description = "Registry of all IJSONCommand's.")
 public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
 {
     private static final Logger                       logger     = Logger.getLogger(CommandRegistry.class);
@@ -69,6 +73,7 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
     }
 
     @Override
+    @ManagedAttribute(description = "Get IJSONCommand names.")
     public List<String> getCommandNames()
     {
         return Collections.unmodifiableList(new ArrayList<String>(m_commands.keySet()));
@@ -93,7 +98,7 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
     }
 
     @Override
-    public void close()
+    public void close() throws IOException
     {
         for (IJSONCommand command : getCommands())
         {

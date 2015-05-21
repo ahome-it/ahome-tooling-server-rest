@@ -36,10 +36,11 @@ import com.ait.tooling.server.rpc.JSONRequestContext;
 import com.ait.tooling.server.rpc.support.spring.IRPCContext;
 import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
-@SuppressWarnings("serial")
 public class JSONCommandRPCServlet extends HTTPServletBase
 {
-    private static final Logger logger = Logger.getLogger(JSONCommandRPCServlet.class);
+    private static final long   serialVersionUID = 8890049936686095786L;
+
+    private static final Logger logger           = Logger.getLogger(JSONCommandRPCServlet.class);
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
@@ -56,7 +57,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
         final String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
 
-        MDC.put("user", ((userid == null) ? UNKNOWN_USER : userid) + "-" + ((sessid == null) ? NULL_SESSION : sessid));
+        MDC.put("user", ((userid == null) ? "no-userid" : userid) + "-" + ((sessid == null) ? "no-sessid" : sessid));
 
         JSONObject object = parseJSON(request);
 
@@ -130,11 +131,22 @@ public class JSONCommandRPCServlet extends HTTPServletBase
         {
             final long tick = System.currentTimeMillis();
 
+            final long nano = System.nanoTime();
+
             final JSONObject result = command.execute(context, object);
 
-            long done = System.currentTimeMillis();
+            final long done = System.currentTimeMillis() - tick;
 
-            logger.info("calling command " + name + " took " + (done - tick) + "ms");
+            final long fast = System.nanoTime() - nano;
+
+            if (done < 1)
+            {
+                logger.info("calling command " + name + " took " + fast + "nano's");
+            }
+            else
+            {
+                logger.info("calling command " + name + " took " + done + "ms's");
+            }
 
             final JSONObject output = new JSONObject("result", result);
 

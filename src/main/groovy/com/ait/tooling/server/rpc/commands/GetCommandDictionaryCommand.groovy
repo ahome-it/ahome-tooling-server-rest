@@ -43,7 +43,7 @@ public class GetCommandDictionaryCommand extends JSONCommandSupport
 
             if (command)
             {
-                final AuthorizationResult auth = getAuthorizationProvider().isAuthorized(command, principals)
+                final AuthorizationResult auth = isAuthorized(command, principals)
 
                 if ((auth) && (auth.isAuthorized()))
                 {
