@@ -18,6 +18,7 @@ package com.ait.tooling.server.rpc.support.spring;
 
 import groovy.lang.Closure;
 
+import java.io.Reader;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,9 +33,7 @@ import com.ait.tooling.server.core.jmx.management.ICoreServerManager;
 import com.ait.tooling.server.core.pubsub.IPubSubDescriptorProvider;
 import com.ait.tooling.server.core.pubsub.IPubSubHandlerRegistration;
 import com.ait.tooling.server.core.pubsub.IPubSubMessageReceivedHandler;
-import com.ait.tooling.server.core.pubsub.IPubSubStateChangedHandler;
 import com.ait.tooling.server.core.pubsub.PubSubChannelType;
-import com.ait.tooling.server.core.pubsub.PubSubStateType;
 import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.security.IAuthorizationProvider;
 import com.ait.tooling.server.core.support.spring.IBuildDescriptorProvider;
@@ -176,18 +175,6 @@ public final class RPCContextInstance implements IRPCContext
     }
 
     @Override
-    public IPubSubHandlerRegistration addStateChangedHandler(String name, PubSubChannelType type, Closure<PubSubStateType> handler) throws Exception
-    {
-        return getServerContext().addStateChangedHandler(name, type, handler);
-    }
-
-    @Override
-    public IPubSubHandlerRegistration addStateChangedHandler(String name, PubSubChannelType type, IPubSubStateChangedHandler handler) throws Exception
-    {
-        return getServerContext().addStateChangedHandler(name, type, handler);
-    }
-
-    @Override
     public Logger logger()
     {
         return logger;
@@ -233,5 +220,17 @@ public final class RPCContextInstance implements IRPCContext
     public String uuid()
     {
         return getServerContext().uuid();
+    }
+
+    @Override
+    public JSONObject parseJSON(String string) throws Exception
+    {
+        return getServerContext().parseJSON(string);
+    }
+
+    @Override
+    public JSONObject parseJSON(Reader reader) throws Exception
+    {
+        return getServerContext().parseJSON(reader);
     }
 }
