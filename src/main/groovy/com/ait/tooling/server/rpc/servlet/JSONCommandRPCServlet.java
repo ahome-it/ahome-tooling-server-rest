@@ -210,6 +210,6 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
     protected final IRPCContext getRPCContext()
     {
-        return RPCContextInstance.get();
+        return RPCContextInstance.getRPCContextInstance();
     }
 }

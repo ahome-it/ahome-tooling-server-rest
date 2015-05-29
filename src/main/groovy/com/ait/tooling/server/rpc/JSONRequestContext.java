@@ -65,7 +65,7 @@ public class JSONRequestContext implements IJSONRequestContext
 
     public IServerContext getServerContext()
     {
-        return ServerContextInstance.get();
+        return ServerContextInstance.getServerContextInstance();
     }
 
     @Override

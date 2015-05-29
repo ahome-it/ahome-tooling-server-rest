@@ -44,7 +44,7 @@ public class RPCSupport extends CoreGroovySupport implements Serializable
     @Memoized
     public IRPCContext getRPCContext()
     {
-        RPCContextInstance.get()
+        RPCContextInstance.getRPCContextInstance()
     }
 
     @Memoized

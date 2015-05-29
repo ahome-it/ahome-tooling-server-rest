@@ -33,7 +33,7 @@ public trait RPCTrait
     @Memoized
     public IRPCContext getRPCContext()
     {
-        RPCContextInstance.get()
+        RPCContextInstance.getRPCContextInstance()
     }
 
     @Memoized
