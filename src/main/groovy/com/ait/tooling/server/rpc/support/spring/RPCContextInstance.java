@@ -39,7 +39,7 @@ public class RPCContextInstance extends ServerContextInstance implements IRPCCon
     @Override
     public ICommandRegistry getCommandRegistry()
     {
-        return Objects.requireNonNull(getBean("CommandRegistry", ICommandRegistry.class), "CommandRegistry is null, initialization error.");
+        return Objects.requireNonNull(getBeanSafely("CommandRegistry", ICommandRegistry.class), "CommandRegistry is null, initialization error.");
     }
 
     @Override
