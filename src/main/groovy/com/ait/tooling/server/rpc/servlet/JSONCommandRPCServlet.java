@@ -16,6 +16,7 @@
 
 package com.ait.tooling.server.rpc.servlet;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ import com.ait.tooling.json.parser.JSONParser;
 import com.ait.tooling.json.parser.JSONParserException;
 import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
+import com.ait.tooling.server.core.support.CoreGroovySupport;
 import com.ait.tooling.server.rpc.IJSONCommand;
 import com.ait.tooling.server.rpc.JSONRequestContext;
 import com.ait.tooling.server.rpc.support.spring.IRPCContext;
@@ -197,15 +199,17 @@ public class JSONCommandRPCServlet extends HTTPServletBase
         response.setContentType(CONTENT_TYPE_APPLICATION_JSON);
 
         response.getWriter().flush();
+        
+        final BufferedWriter buff = new BufferedWriter(response.getWriter(), 1024);
 
-        output.writeJSONString(response.getWriter());
-
-        response.getWriter().flush();
+        output.writeJSONString(buff, true);
+        
+        buff.flush();
     }
 
     protected boolean isRunning()
     {
-        return getRPCContext().getCoreServerManager().isRunning();
+        return CoreGroovySupport.getCoreGroovySupport().getCoreServerManager().isRunning();
     }
 
     protected final IRPCContext getRPCContext()
