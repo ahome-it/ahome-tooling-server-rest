@@ -16,7 +16,6 @@
 
 package com.ait.tooling.server.rpc.servlet;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,6 +29,7 @@ import com.ait.tooling.common.api.java.util.UUID;
 import com.ait.tooling.json.JSONObject;
 import com.ait.tooling.json.parser.JSONParser;
 import com.ait.tooling.json.parser.JSONParserException;
+import com.ait.tooling.server.core.io.NoSyncBufferedWriter;
 import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.core.support.CoreGroovySupport;
@@ -200,7 +200,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
         response.getWriter().flush();
         
-        final BufferedWriter buff = new BufferedWriter(response.getWriter(), 1024);
+        final NoSyncBufferedWriter buff = new NoSyncBufferedWriter(response.getWriter(), 1024);
 
         output.writeJSONString(buff, true);
         
