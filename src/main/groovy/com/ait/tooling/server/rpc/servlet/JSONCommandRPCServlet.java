@@ -40,9 +40,11 @@ import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
 public class JSONCommandRPCServlet extends HTTPServletBase
 {
-    private static final long   serialVersionUID = 8890049936686095786L;
+    private static final long   serialVersionUID            = 8890049936686095786L;
 
-    private static final Logger logger           = Logger.getLogger(JSONCommandRPCServlet.class);
+    private static final double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
+
+    private static final Logger logger                      = Logger.getLogger(JSONCommandRPCServlet.class);
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
@@ -133,17 +135,19 @@ public class JSONCommandRPCServlet extends HTTPServletBase
         {
             final long tick = System.currentTimeMillis();
 
-            final long nano = System.nanoTime();
+            final long time = System.nanoTime();
 
             final JSONObject result = command.execute(context, object);
 
             final long done = System.currentTimeMillis() - tick;
 
-            final long fast = System.nanoTime() - nano;
+            final long fast = System.nanoTime() - time;
 
             if (done < 1)
             {
-                logger.info("calling command " + name + " took " + fast + "nano's");
+                double nano = (double) (Math.round((fast * NANOSECONDS_TO_MILLISECONDS) * 1000000) / 1000000);
+
+                logger.info("calling command " + name + " took " + nano + "ms's");
             }
             else
             {
@@ -199,11 +203,11 @@ public class JSONCommandRPCServlet extends HTTPServletBase
         response.setContentType(CONTENT_TYPE_APPLICATION_JSON);
 
         response.getWriter().flush();
-        
+
         final NoSyncBufferedWriter buff = new NoSyncBufferedWriter(response.getWriter(), 1024);
 
         output.writeJSONString(buff, true);
-        
+
         buff.flush();
     }
 
