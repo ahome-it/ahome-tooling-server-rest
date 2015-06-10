@@ -40,11 +40,9 @@ import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
 public class JSONCommandRPCServlet extends HTTPServletBase
 {
-    private static final long   serialVersionUID            = 8890049936686095786L;
+    private static final long   serialVersionUID = 8890049936686095786L;
 
-    private static final double NANOSECONDS_TO_MILLISECONDS = 1.0 / 1000000.0;
-
-    private static final Logger logger                      = Logger.getLogger(JSONCommandRPCServlet.class);
+    private static final Logger logger           = Logger.getLogger(JSONCommandRPCServlet.class);
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
@@ -145,15 +143,12 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             if (done < 1)
             {
-                double nano = (double) (Math.round((fast * NANOSECONDS_TO_MILLISECONDS) * 1000000) / 1000000);
-
-                logger.info("calling command " + name + " took " + nano + "ms's");
+                logger.info("calling command " + name + " took " + fast + "nano's");
             }
             else
             {
                 logger.info("calling command " + name + " took " + done + "ms's");
             }
-
             final JSONObject output = new JSONObject("result", result);
 
             writeJSON(response, output);
