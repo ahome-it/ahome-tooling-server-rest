@@ -40,7 +40,7 @@ public class GetCommandSchemasCommand extends JSONCommandSupport
 
         if (command)
         {
-            final AuthorizationResult auth = isAuthorized(command, context.getUserPrincipals())
+            final AuthorizationResult auth = isAuthorized(command, context.getUserRoles())
 
             if (auth)
             {

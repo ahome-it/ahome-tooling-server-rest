@@ -47,5 +47,5 @@ public interface IJSONRequestContext
 
     public JSONObject getJSONParameters();
 
-    public JSONObject getUserPrincipals();
+    public Iterable<String> getUserRoles();
 }

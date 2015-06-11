@@ -37,13 +37,13 @@ public class GetCommandDictionaryCommand extends JSONCommandSupport
     {
         final List list = []
 
-        final JSONObject principals = context.getUserPrincipals()
+        final Iterable<String> roles = context.getUserRoles()
 
         getCommandRegistry().getCommands().each { IJSONCommand command ->
 
             if (command)
             {
-                final AuthorizationResult auth = isAuthorized(command, principals)
+                final AuthorizationResult auth = isAuthorized(command, roles)
 
                 if ((auth) && (auth.isAuthorized()))
                 {

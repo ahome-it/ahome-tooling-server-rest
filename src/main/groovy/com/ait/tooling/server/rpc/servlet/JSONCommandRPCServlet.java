@@ -17,6 +17,7 @@
 package com.ait.tooling.server.rpc.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -26,11 +27,13 @@ import org.apache.log4j.MDC;
 
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.common.api.java.util.UUID;
+import com.ait.tooling.common.server.io.NoSyncBufferedWriter;
 import com.ait.tooling.json.JSONObject;
 import com.ait.tooling.json.parser.JSONParser;
 import com.ait.tooling.json.parser.JSONParserException;
-import com.ait.tooling.server.core.io.NoSyncBufferedWriter;
 import com.ait.tooling.server.core.security.AuthorizationResult;
+import com.ait.tooling.server.core.security.session.IServerSession;
+import com.ait.tooling.server.core.security.session.IServerSessionRepository;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.core.support.CoreGroovySupport;
 import com.ait.tooling.server.rpc.IJSONCommand;
@@ -59,7 +62,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
         final String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
 
-        MDC.put("user", ((userid == null) ? "no-userid" : userid) + "-" + ((sessid == null) ? "no-sessid" : sessid));
+        MDC.put("session", ((userid == null) ? "no-userid" : userid) + "-" + ((sessid == null) ? "no-sessid" : sessid));
 
         JSONObject object = parseJSON(request);
 
@@ -117,7 +120,29 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             return;
         }
-        final AuthorizationResult resp = isAuthorized(command, getUserPrincipalsFromRequest(request, getServerContext().getPrincipalsKeys()));
+        Iterable<String> roles = null;
+
+        if (null != sessid)
+        {
+            final String domain_name = StringOps.toTrimOrNull(getServletConfig().getInitParameter("session_domain_name"));
+
+            final IServerSessionRepository repository = getServerContext().getServerSessionRepository((domain_name == null) ? "default" : domain_name);
+
+            if (null != repository)
+            {
+                final IServerSession session = repository.getSession(sessid);
+
+                if ((null != session) && (false == session.isExpired()))
+                {
+                    roles = session.getRoles();
+                }
+            }
+        }
+        if (null == roles)
+        {
+            roles = new ArrayList<String>(0);
+        }
+        final AuthorizationResult resp = isAuthorized(command, roles);
 
         if (false == resp.isAuthorized())
         {
@@ -127,7 +152,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             return;
         }
-        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), getServletContext(), request, response);
+        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), roles, getServletContext(), request, response);
 
         try
         {

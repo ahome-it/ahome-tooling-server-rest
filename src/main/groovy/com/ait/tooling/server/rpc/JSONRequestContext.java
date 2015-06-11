@@ -36,19 +36,23 @@ public class JSONRequestContext implements IJSONRequestContext
 
     private final boolean             m_admin;
 
+    private final Iterable<String>    m_roles;
+
     private final ServletContext      m_servlet_context;
 
     private final HttpServletRequest  m_servlet_request;
 
     private final HttpServletResponse m_servlet_response;
 
-    public JSONRequestContext(String userid, String sessid, boolean admin, ServletContext context, HttpServletRequest request, HttpServletResponse response)
+    public JSONRequestContext(String userid, String sessid, boolean admin, Iterable<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response)
     {
         m_userid = userid;
 
         m_sessid = sessid;
 
         m_admin = admin;
+
+        m_roles = roles;
 
         m_servlet_context = context;
 
@@ -147,7 +151,7 @@ public class JSONRequestContext implements IJSONRequestContext
     @Override
     public void doResetMDC()
     {
-        MDC.put("user", ((m_userid == null) ? "NONE" : m_userid) + "-" + ((m_sessid == null) ? "NONE" : m_sessid));
+        MDC.put("session", ((m_userid == null) ? "no-userid" : m_userid) + "-" + ((m_sessid == null) ? "no-sessid" : m_sessid));
     }
 
     @Override
@@ -163,8 +167,8 @@ public class JSONRequestContext implements IJSONRequestContext
     }
 
     @Override
-    public JSONObject getUserPrincipals()
+    public Iterable<String> getUserRoles()
     {
-        return HTTPServletBase.getUserPrincipalsFromRequest(getServletRequest(), getServerContext().getPrincipalsKeys());
+        return m_roles;
     }
 }
