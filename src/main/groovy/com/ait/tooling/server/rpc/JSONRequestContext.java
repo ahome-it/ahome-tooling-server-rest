@@ -16,6 +16,8 @@
 
 package com.ait.tooling.server.rpc;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -36,7 +38,7 @@ public class JSONRequestContext implements IJSONRequestContext
 
     private final boolean             m_admin;
 
-    private final Iterable<String>    m_roles;
+    private final List<String>        m_roles;
 
     private final ServletContext      m_servlet_context;
 
@@ -44,7 +46,7 @@ public class JSONRequestContext implements IJSONRequestContext
 
     private final HttpServletResponse m_servlet_response;
 
-    public JSONRequestContext(String userid, String sessid, boolean admin, Iterable<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response)
+    public JSONRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response)
     {
         m_userid = userid;
 
@@ -167,7 +169,7 @@ public class JSONRequestContext implements IJSONRequestContext
     }
 
     @Override
-    public Iterable<String> getUserRoles()
+    public List<String> getUserRoles()
     {
         return m_roles;
     }

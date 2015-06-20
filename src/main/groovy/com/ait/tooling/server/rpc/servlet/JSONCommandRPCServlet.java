@@ -18,6 +18,7 @@ package com.ait.tooling.server.rpc.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -120,7 +121,7 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             return;
         }
-        Iterable<String> roles = null;
+        List<String> roles = null;
 
         if (null != sessid)
         {
@@ -162,9 +163,9 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             final JSONObject result = command.execute(context, object);
 
-            final long done = System.currentTimeMillis() - tick;
-
             final long fast = System.nanoTime() - time;
+
+            final long done = System.currentTimeMillis() - tick;
 
             if (done < 1)
             {

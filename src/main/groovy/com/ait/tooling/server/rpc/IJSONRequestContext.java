@@ -16,6 +16,8 @@
 
 package com.ait.tooling.server.rpc;
 
+import java.util.List;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,5 +49,5 @@ public interface IJSONRequestContext
 
     public JSONObject getJSONParameters();
 
-    public Iterable<String> getUserRoles();
+    public List<String> getUserRoles();
 }
