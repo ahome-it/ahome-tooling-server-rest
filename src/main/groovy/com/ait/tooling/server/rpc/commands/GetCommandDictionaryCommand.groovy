@@ -37,7 +37,7 @@ public class GetCommandDictionaryCommand extends JSONCommandSupport
     {
         final List list = []
 
-        final Iterable<String> roles = context.getUserRoles()
+        final List<String> roles = context.getUserRoles()
 
         getCommandRegistry().getCommands().each { IJSONCommand command ->
 

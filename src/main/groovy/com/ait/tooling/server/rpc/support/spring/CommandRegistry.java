@@ -36,7 +36,7 @@ import com.ait.tooling.server.rpc.IJSONCommand;
 /**
  * CommandRegistry - Registry of all IJSONCommand services found in the application.
  */
-@ManagedResource(objectName = "com.ait.tooling.server.rpc.support.spring:name=CommandRegistry", description = "Registry of all IJSONCommand's.")
+@ManagedResource
 public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
 {
     private static final Logger                       logger     = Logger.getLogger(CommandRegistry.class);
