@@ -13,7 +13,7 @@ RELEASE:
 <dependency>
   <groupId>com.ahome-it</groupId>
   <artifactId>ahome-tooling-server-rpc</artifactId>
-  <version>1.0.95-RELEASE</version>
+  <version>1.0.97-RELEASE</version>
 </dependency>
 ```
 
