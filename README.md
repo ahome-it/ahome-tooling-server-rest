@@ -9,15 +9,25 @@ Downloading artifacts
 
 RELEASE:
 
+Maven:
 ```xml
 <dependency>
   <groupId>com.ahome-it</groupId>
   <artifactId>ahome-tooling-server-rpc</artifactId>
-  <version>1.0.105-RELEASE</version>
+  <version>1.0.106-RELEASE</version>
 </dependency>
 ```
+Gradle:
+```
+dependencies {
+    compile(group:'com.ahome-it',name:'ahome-tooling-server-rpc',version:'1.0.106-RELEASE')
+}
+```
+Javadoc URL:
 
-License
+http://lienzo-core.com/documents/javadoc/ahome-tooling-server-rpc
+
+License:
 
 Ahome Tooling Common is released under version 2.0 of the Apache License.
 
