@@ -39,9 +39,11 @@ import com.ait.tooling.server.rpc.IJSONCommand;
 @ManagedResource
 public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
 {
-    private static final Logger                       logger     = Logger.getLogger(CommandRegistry.class);
+    private static final long                         serialVersionUID = -8612763973722004339L;
 
-    private final LinkedHashMap<String, IJSONCommand> m_commands = new LinkedHashMap<String, IJSONCommand>();
+    private static final Logger                       logger           = Logger.getLogger(CommandRegistry.class);
+
+    private final LinkedHashMap<String, IJSONCommand> m_commands       = new LinkedHashMap<String, IJSONCommand>();
 
     public CommandRegistry()
     {

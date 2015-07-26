@@ -16,15 +16,8 @@
 
 package com.ait.tooling.server.rpc.support.spring;
 
-import java.util.List;
-
 import com.ait.tooling.server.rpc.IJSONCommand;
 
 public interface ICommandRegistry extends ICommandRegistryOf<IJSONCommand>
 {
-    public IJSONCommand getCommand(String name);
-
-    public List<String> getCommandNames();
-
-    public List<IJSONCommand> getCommands();
 }

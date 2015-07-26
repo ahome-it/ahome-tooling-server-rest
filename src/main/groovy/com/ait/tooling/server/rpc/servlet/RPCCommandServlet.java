@@ -42,11 +42,15 @@ import com.ait.tooling.server.rpc.JSONRequestContext;
 import com.ait.tooling.server.rpc.support.spring.IRPCContext;
 import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
-public class JSONCommandRPCServlet extends HTTPServletBase
+public class RPCCommandServlet extends HTTPServletBase
 {
     private static final long   serialVersionUID = 8890049936686095786L;
 
-    private static final Logger logger           = Logger.getLogger(JSONCommandRPCServlet.class);
+    private static final Logger logger           = Logger.getLogger(RPCCommandServlet.class);
+
+    public RPCCommandServlet()
+    {
+    }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
@@ -75,23 +79,57 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             return;
         }
-        if (false == object.isDefined("command"))
+        String name = null;
+
+        if (isCommandInBody())
         {
-            logger.error("no command key found");
+            if (false == object.isDefined("command"))
+            {
+                logger.error("no command key found");
 
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            return;
+                return;
+            }
+            name = StringOps.toTrimOrNull(object.getAsString("command"));
+
+            if (null == name)
+            {
+                logger.error("empty command key found");
+
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                return;
+            }
         }
-        final String name = StringOps.toTrimOrNull(object.getAsString("command"));
-
-        if (null == name)
+        else
         {
-            logger.error("empty command key found");
+            name = StringOps.toTrimOrNull(request.getPathInfo());
 
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            if (null != name)
+            {
+                int indx = name.lastIndexOf("/");
 
-            return;
+                if (indx >= 0)
+                {
+                    name = StringOps.toTrimOrNull(name.substring(indx + 1));
+                }
+                if (null != name)
+                {
+                    if (name.endsWith(".rpc"))
+                    {
+                        name = StringOps.toTrimOrNull(name.substring(0, name.length() - 4));
+                    }
+                }
+            }
+            if (null == name)
+            {
+                logger.error("empty command path found");
+
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                return;
+            }
         }
         final IJSONCommand command = getRPCContext().getCommand(name);
 
@@ -189,6 +227,11 @@ public class JSONCommandRPCServlet extends HTTPServletBase
 
             writeJSON(response, output);
         }
+    }
+
+    protected boolean isCommandInBody()
+    {
+        return true;
     }
 
     protected JSONObject parseJSON(final HttpServletRequest request)

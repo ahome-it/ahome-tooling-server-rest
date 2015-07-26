@@ -46,23 +46,6 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     }
 
     @Override
-    public String getVersion()
-    {
-        final Class<?> type = getClass()
-
-        if (type.isAnnotationPresent(RPCVersion.class))
-        {
-            final String version = StringOps.toTrimOrNull(type.getAnnotation(RPCVersion.class).value())
-
-            if (StringOps.isVersionID(version))
-            {
-                return version
-            }
-        }
-        '1.0'
-    }
-
-    @Override
     public JSONObject getValidation()
     {
         json([request: false, response: false])
@@ -71,7 +54,7 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     @Override
     public JSONObject getCommandMetaData()
     {
-        json([name: getName(), version: getVersion(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
+        json([name: getName(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
     }
 
     @Override

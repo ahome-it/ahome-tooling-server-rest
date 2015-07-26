@@ -16,6 +16,7 @@
 
 package com.ait.tooling.server.rpc;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -25,7 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ait.tooling.json.JSONObject;
 import com.ait.tooling.server.core.support.spring.IServerContext;
 
-public interface IJSONRequestContext
+public interface IJSONRequestContext extends Serializable
 {
     public boolean isAdmin();
 

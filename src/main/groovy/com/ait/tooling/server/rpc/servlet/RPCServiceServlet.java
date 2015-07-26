@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.ait.tooling.server.rpc;
+package com.ait.tooling.server.rpc.servlet;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RPCVersion
+public class RPCServiceServlet extends RPCCommandServlet
 {
-    String value() default "1.0";
+    private static final long serialVersionUID = -4306870300451480785L;
+
+    public RPCServiceServlet()
+    {
+    }
+
+    protected boolean isCommandInBody()
+    {
+        return false;
+    }
 }

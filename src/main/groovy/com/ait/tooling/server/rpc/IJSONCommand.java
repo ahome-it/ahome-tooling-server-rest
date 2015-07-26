@@ -24,8 +24,6 @@ import com.ait.tooling.json.schema.JSONSchema;
 
 public interface IJSONCommand extends INamed, Closeable
 {
-    public String getVersion();
-
     public JSONObject execute(IJSONRequestContext context, JSONObject object) throws Exception;
 
     public JSONObject getValidation();

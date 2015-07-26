@@ -32,6 +32,8 @@ import com.ait.tooling.server.core.support.spring.ServerContextInstance;
 
 public class JSONRequestContext implements IJSONRequestContext
 {
+    private static final long         serialVersionUID = -1336953145524645090L;
+
     private final String              m_userid;
 
     private final String              m_sessid;
@@ -69,6 +71,7 @@ public class JSONRequestContext implements IJSONRequestContext
         return m_admin;
     }
 
+    @Override
     public IServerContext getServerContext()
     {
         return ServerContextInstance.getServerContextInstance();
@@ -134,7 +137,7 @@ public class JSONRequestContext implements IJSONRequestContext
             {
                 Cookie cookie = new Cookie(name, value);
 
-                cookie.setMaxAge(60 * 60 * 24 * 365); // one year
+                cookie.setMaxAge(60 * 60 * 24 * 365);// one year
 
                 String ruri = request.getHeader("Referer");
 

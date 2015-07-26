@@ -26,9 +26,6 @@ import com.ait.tooling.server.rpc.support.spring.IRPCContext
 import com.ait.tooling.server.rpc.support.spring.RPCContextInstance
 
 @CompileStatic
-/**
- * RPCSupport - Support class in Groovy that exposes common RPC methods, but Memoized for efficiency.
- */
 public class RPCSupport extends CoreGroovySupport implements Serializable
 {
     private static final RPCSupport INSTANCE            = new RPCSupport()

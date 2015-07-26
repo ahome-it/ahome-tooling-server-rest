@@ -17,7 +17,6 @@
 package com.ait.tooling.server.rpc.support
 
 import groovy.transform.CompileStatic
-import groovy.transform.Memoized
 
 import com.ait.tooling.server.rpc.IJSONCommand
 import com.ait.tooling.server.rpc.support.spring.ICommandRegistry
@@ -25,21 +24,18 @@ import com.ait.tooling.server.rpc.support.spring.IRPCContext
 import com.ait.tooling.server.rpc.support.spring.RPCContextInstance
 
 @CompileStatic
-public trait RPCTrait
+public trait RPCTraitPlain
 {
-    @Memoized
     public IRPCContext getRPCContext()
     {
         RPCContextInstance.getRPCContextInstance()
     }
 
-    @Memoized
     public ICommandRegistry getCommandRegistry()
     {
         getRPCContext().getCommandRegistry()
     }
 
-    @Memoized
     public IJSONCommand getCommand(String name)
     {
         getCommandRegistry().getCommand(name)

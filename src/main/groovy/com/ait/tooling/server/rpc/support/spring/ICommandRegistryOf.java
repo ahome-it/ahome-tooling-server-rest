@@ -17,11 +17,12 @@
 package com.ait.tooling.server.rpc.support.spring;
 
 import java.io.Closeable;
+import java.io.Serializable;
 import java.util.List;
 
 import com.ait.tooling.server.rpc.IJSONCommand;
 
-public interface ICommandRegistryOf<T extends IJSONCommand> extends Closeable
+public interface ICommandRegistryOf<T extends IJSONCommand> extends Serializable, Closeable
 {
     public T getCommand(String name);
 
