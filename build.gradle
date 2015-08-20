@@ -36,7 +36,7 @@ sourceCompatibility = 1.7
 
 targetCompatibility = 1.7
 
-version = '1.0.108-RELEASE'
+version = '1.0.109-RELEASE'
 
 group = 'com.ahome-it'
 
@@ -162,7 +162,7 @@ tasks.withType(GroovyCompile) {
 }
 
 dependencies {
-    compile(group: 'com.ahome-it', name: 'ahome-tooling-server-core', version: '1.0.108-RELEASE')
+    compile(group: 'com.ahome-it', name: 'ahome-tooling-server-core', version: '1.0.109-RELEASE')
 }
 
 artifacts {
