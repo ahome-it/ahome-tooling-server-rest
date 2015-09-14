@@ -21,8 +21,8 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.common.api.java.util.StringOps
-import com.ait.tooling.json.JSONObject
-import com.ait.tooling.json.schema.JSONSchema
+import com.ait.tooling.server.core.json.JSONObject
+import com.ait.tooling.server.core.json.schema.JSONSchema
 import com.ait.tooling.server.rpc.support.RPCSupport
 
 @CompileStatic

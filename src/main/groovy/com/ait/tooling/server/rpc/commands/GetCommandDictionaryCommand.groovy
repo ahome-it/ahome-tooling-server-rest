@@ -20,7 +20,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Service
 
-import com.ait.tooling.json.JSONObject
+import com.ait.tooling.server.core.json.JSONObject
 import com.ait.tooling.server.core.security.AuthorizationResult
 import com.ait.tooling.server.core.security.Authorized
 import com.ait.tooling.server.rpc.IJSONCommand

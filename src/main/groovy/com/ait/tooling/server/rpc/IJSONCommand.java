@@ -19,8 +19,8 @@ package com.ait.tooling.server.rpc;
 import java.io.Closeable;
 
 import com.ait.tooling.common.api.types.INamed;
-import com.ait.tooling.json.JSONObject;
-import com.ait.tooling.json.schema.JSONSchema;
+import com.ait.tooling.server.core.json.JSONObject;
+import com.ait.tooling.server.core.json.schema.JSONSchema;
 
 public interface IJSONCommand extends INamed, Closeable
 {

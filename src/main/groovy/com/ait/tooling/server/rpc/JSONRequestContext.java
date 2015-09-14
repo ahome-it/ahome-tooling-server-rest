@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.MDC;
 
-import com.ait.tooling.json.JSONObject;
+import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.core.support.spring.IServerContext;
 import com.ait.tooling.server.core.support.spring.ServerContextInstance;
@@ -137,7 +137,7 @@ public class JSONRequestContext implements IJSONRequestContext
             {
                 Cookie cookie = new Cookie(name, value);
 
-                cookie.setMaxAge(60 * 60 * 24 * 365);// one year
+                cookie.setMaxAge(60 * 60 * 24 * 365); // one year
 
                 String ruri = request.getHeader("Referer");
 

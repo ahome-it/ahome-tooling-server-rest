@@ -23,7 +23,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ait.tooling.json.JSONObject;
+import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.support.spring.IServerContext;
 
 public interface IJSONRequestContext extends Serializable
