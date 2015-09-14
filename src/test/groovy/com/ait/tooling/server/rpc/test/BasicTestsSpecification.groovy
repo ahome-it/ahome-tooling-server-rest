@@ -19,6 +19,7 @@ package com.ait.tooling.server.rpc.test
 import com.ait.tooling.server.core.support.CoreGroovyTrait
 import com.ait.tooling.server.core.support.spring.IServerContext
 import com.ait.tooling.server.core.support.spring.testing.spock.ServerCoreSpecification
+import com.ait.tooling.server.core.support.spring.testing.IServerCoreTesting.TestingOps
 
 class BasicTestsSpecification extends ServerCoreSpecification implements CoreGroovyTrait
 {
