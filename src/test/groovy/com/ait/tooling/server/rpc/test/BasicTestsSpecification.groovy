@@ -52,7 +52,7 @@ class BasicTestsSpecification extends ServerCoreSpecification implements CoreGro
     def "test JSONObject"()
     {
         setup:
-        def valu = json(name: "Dean")
+        def valu = json([name: "Dean"])
 
         expect:
         valu['name'] == "Dean"
