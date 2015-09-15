@@ -14,13 +14,13 @@ Maven:
 <dependency>
   <groupId>com.ahome-it</groupId>
   <artifactId>ahome-tooling-server-rpc</artifactId>
-  <version>1.0.110-RELEASE</version>
+  <version>1.0.111-RELEASE</version>
 </dependency>
 ```
 Gradle:
 ```
 dependencies {
-    compile(group:'com.ahome-it',name:'ahome-tooling-server-rpc',version:'1.0.110-RELEASE')
+    compile(group:'com.ahome-it',name:'ahome-tooling-server-rpc',version:'1.0.111-RELEASE')
 }
 ```
 Javadoc URL:
