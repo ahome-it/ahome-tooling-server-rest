@@ -25,12 +25,12 @@ class BasicTestsSpecification extends ServerCoreSpecification implements CoreGro
 {
     def setupSpec()
     {        
-        TestingOps.setupServerCoreContext(["classpath:/com/ait/tooling/server/rpc/test/ApplicationContext.xml", "classpath:/com/ait/tooling/server/core/config/CoreApplicationContext.xml"])
+        TestingOps.setupServerCoreDefault(["classpath:/com/ait/tooling/server/rpc/test/ApplicationContext.xml", "classpath:/com/ait/tooling/server/core/config/CoreApplicationContext.xml"])
     }
 
     def cleanupSpec()
     {
-        TestingOps.closeServerCoreContext()
+        TestingOps.closeServerCoreDefault()
     }
 
     def "test server context property provider"()
