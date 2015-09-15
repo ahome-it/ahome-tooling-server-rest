@@ -188,6 +188,11 @@ test {
         destinationFile = file("build/jacoco/testing.exec")
         classDumpFile = file("build/jacoco/classpathdumps")
     }
+    include '**/*TestSpec*'
+    testLogging.showStandardStreams = true
+    testLogging {
+        events 'started', 'passed'
+    }
 }
 
 tasks.withType(GroovyCompile) {
