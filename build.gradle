@@ -195,6 +195,7 @@ tasks.withType(GroovyCompile) {
 }
 
 dependencies {
+    compile('org.slf4j:slf4j-simple:1.7.12')
     compile(group: 'com.ahome-it', name: 'ahome-tooling-server-core', version: '1.0.110-RELEASE')
 }
 
