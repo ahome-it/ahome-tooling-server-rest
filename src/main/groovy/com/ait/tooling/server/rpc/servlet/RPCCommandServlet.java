@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.common.api.java.util.UUID;
@@ -66,8 +65,6 @@ public class RPCCommandServlet extends HTTPServletBase
         final String userid = StringOps.toTrimOrNull(request.getHeader(X_USER_ID_HEADER));
 
         final String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
-
-        MDC.put("session", ((userid == null) ? "no-userid" : userid) + "-" + ((sessid == null) ? "no-sessid" : sessid));
 
         JSONObject object = parseJSON(request);
 
