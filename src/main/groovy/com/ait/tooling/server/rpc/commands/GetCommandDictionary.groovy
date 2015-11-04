@@ -20,7 +20,6 @@ import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Service
 
-import com.ait.tooling.common.api.java.util.StringOps
 import com.ait.tooling.server.core.json.JSONObject
 import com.ait.tooling.server.core.security.AuthorizationResult
 import com.ait.tooling.server.core.security.Authorized
@@ -31,33 +30,27 @@ import com.ait.tooling.server.rpc.JSONCommandSupport
 @Service
 @Authorized
 @CompileStatic
-public class GetCommandSchemasCommand extends JSONCommandSupport
+public class GetCommandDictionary extends JSONCommandSupport
 {
     @Override
     public JSONObject execute(final IJSONRequestContext context, final JSONObject object) throws Exception
     {
-        final IJSONCommand command = getCommand(StringOps.requireTrimOrNull(object.getAsString('name'), 'Field [name] missing, null, or empty in request'))
+        final List list = []
 
-        if (command)
-        {
-            final AuthorizationResult auth = isAuthorized(command, context.getUserRoles())
+        final List<String> roles = context.getUserRoles()
 
-            if (auth)
+        getCommandRegistry().getCommands().each { IJSONCommand command ->
+
+            if (command)
             {
-                if (auth.isAuthorized())
+                final AuthorizationResult auth = isAuthorized(command, roles)
+
+                if ((auth) && (auth.isAuthorized()))
                 {
-                    return json([schemas: [name: command.getName(), request: command.getRequestSchema(), response: command.getResponseSchema()]])
+                    list << command.getCommandMetaData()
                 }
-                else
-                {
-                    return json([error: auth.getText(), command: command.getName()])
-                }
-            }
-            else
-            {
-                return json([error: 'Missing or null AuthroizationResult', command: command.getName()])
             }
         }
-        json([error: 'Not found', command: command.getName()])
+        json(list)
     }
 }

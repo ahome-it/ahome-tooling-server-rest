@@ -20,6 +20,7 @@ import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Service
 
+import com.ait.tooling.common.api.java.util.StringOps
 import com.ait.tooling.server.core.json.JSONObject
 import com.ait.tooling.server.core.security.AuthorizationResult
 import com.ait.tooling.server.core.security.Authorized
@@ -30,27 +31,33 @@ import com.ait.tooling.server.rpc.JSONCommandSupport
 @Service
 @Authorized
 @CompileStatic
-public class GetCommandDictionaryCommand extends JSONCommandSupport
+public class GetCommandSchemas extends JSONCommandSupport
 {
     @Override
     public JSONObject execute(final IJSONRequestContext context, final JSONObject object) throws Exception
     {
-        final List list = []
+        final IJSONCommand command = getCommand(StringOps.requireTrimOrNull(object.getAsString('name'), 'Field [name] missing, null, or empty in request'))
 
-        final List<String> roles = context.getUserRoles()
+        if (command)
+        {
+            final AuthorizationResult auth = isAuthorized(command, context.getUserRoles())
 
-        getCommandRegistry().getCommands().each { IJSONCommand command ->
-
-            if (command)
+            if (auth)
             {
-                final AuthorizationResult auth = isAuthorized(command, roles)
-
-                if ((auth) && (auth.isAuthorized()))
+                if (auth.isAuthorized())
                 {
-                    list << command.getCommandMetaData()
+                    return json([schemas: [name: command.getRequestPath(), request: command.getRequestSchema(), response: command.getResponseSchema()]])
+                }
+                else
+                {
+                    return json([error: auth.getText(), name: command.getRequestPath()])
                 }
             }
+            else
+            {
+                return json([error: 'Missing or null AuthroizationResult', name: command.getRequestPath()])
+            }
         }
-        json(list)
+        json([error: 'Not found', name: command.getRequestPath()])
     }
 }

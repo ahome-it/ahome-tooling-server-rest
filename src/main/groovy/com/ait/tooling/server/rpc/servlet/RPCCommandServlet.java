@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -38,6 +39,7 @@ import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.core.support.CoreGroovySupport;
 import com.ait.tooling.server.rpc.IJSONCommand;
 import com.ait.tooling.server.rpc.JSONRequestContext;
+import com.ait.tooling.server.rpc.RequestType;
 import com.ait.tooling.server.rpc.support.spring.IRPCContext;
 import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
@@ -51,8 +53,73 @@ public class RPCCommandServlet extends HTTPServletBase
     {
     }
 
+    protected String getRPCPathPrefix()
+    {
+        return getServletConfig().getInitParameter("rpc_path_prefix");
+    }
+
+    @Override
+    public void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
+    {
+        if (false == isRunning())
+        {
+            logger.error("server is suspended, refuse command request");
+
+            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+
+            return;
+        }
+        super.service(request, response);
+    }
+
+    protected void doNoCache(final HttpServletResponse response)
+    {
+        final long time = System.currentTimeMillis();
+
+        response.setDateHeader(DATE_HEADER, time);
+
+        response.setDateHeader(EXPIRES_HEADER, time - 31536000000L);
+
+        response.setHeader(PRAGMA_HEADER, "no-cache");
+
+        response.setHeader(CACHE_CONTROL_HEADER, "no-cache, no-store, must-revalidate");
+    }
+
+    @Override
+    public void doHead(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    {
+        doNoCache(response);
+
+        response.setContentLength(0);
+
+        response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    @Override
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    {
+        doCommand(request, response, false, RequestType.GET, getJSONParametersFromRequest(request));
+    }
+
+    @Override
+    public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    {
+        doCommand(request, response, true, RequestType.PUT, null);
+    }
+
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    {
+        doCommand(request, response, true, RequestType.POST, null);
+    }
+
+    @Override
+    public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    {
+        doCommand(request, response, true, RequestType.DELETE, null);
+    }
+
+    protected void doCommand(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestType type, JSONObject object) throws IOException
     {
         if (false == isRunning())
         {
@@ -66,11 +133,13 @@ public class RPCCommandServlet extends HTTPServletBase
 
         final String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
 
-        JSONObject object = parseJSON(request);
-
+        if (read)
+        {
+            object = parseJSON(request, type);
+        }
         if (null == object)
         {
-            logger.error("passed body is not a JSONObject");
+            logger.error("passed data is not a JSONObject");
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
@@ -78,7 +147,11 @@ public class RPCCommandServlet extends HTTPServletBase
         }
         String name = null;
 
-        if (isCommandInBody())
+        boolean body = false;
+
+        boolean lead = false;
+
+        if ((read) && isCommandInBody())
         {
             if (false == object.isDefined("command"))
             {
@@ -107,6 +180,19 @@ public class RPCCommandServlet extends HTTPServletBase
             {
                 int indx = name.lastIndexOf("/");
 
+                final String prfx = StringOps.toTrimOrNull(getRPCPathPrefix());
+
+                if (null != prfx)
+                {
+                    indx = name.indexOf(prfx);
+
+                    if (indx >= 0)
+                    {
+                        lead = true;
+
+                        indx = indx + prfx.length();
+                    }
+                }
                 if (indx >= 0)
                 {
                     name = StringOps.toTrimOrNull(name.substring(indx + 1));
@@ -115,7 +201,16 @@ public class RPCCommandServlet extends HTTPServletBase
                 {
                     if (name.endsWith(".rpc"))
                     {
+                        body = true;
+
                         name = StringOps.toTrimOrNull(name.substring(0, name.length() - 4));
+                    }
+                    if (lead)
+                    {
+                        if (false == name.startsWith("/"))
+                        {
+                            name = "/" + name;
+                        }
                     }
                 }
             }
@@ -138,23 +233,34 @@ public class RPCCommandServlet extends HTTPServletBase
 
             return;
         }
-        if (false == object.isDefined("request"))
+        if (false == command.isRequestOfType(type))
         {
-            logger.error("no request key found");
+            logger.error("command " + name + " not type " + type);
 
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 
             return;
         }
-        object = object.getAsObject("request");
-
-        if (null == object)
+        if ((read) && (body))
         {
-            logger.error("empty request key found");
+            if (false == object.isDefined("request"))
+            {
+                logger.error("no request key found");
 
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            return;
+                return;
+            }
+            object = object.getAsObject("request");
+
+            if (null == object)
+            {
+                logger.error("empty request key found");
+
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+                return;
+            }
         }
         List<String> roles = null;
 
@@ -188,7 +294,7 @@ public class RPCCommandServlet extends HTTPServletBase
 
             return;
         }
-        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), roles, getServletContext(), request, response);
+        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), roles, getServletContext(), request, response, type);
 
         try
         {
@@ -210,9 +316,14 @@ public class RPCCommandServlet extends HTTPServletBase
             {
                 logger.info("calling command " + name + " took " + done + "ms's");
             }
-            final JSONObject output = new JSONObject("result", result);
-
-            writeJSON(response, output);
+            if (body)
+            {
+                writeJSON(response, new JSONObject("result", result));
+            }
+            else
+            {
+                writeJSON(response, result);
+            }
         }
         catch (Throwable e)
         {
@@ -231,34 +342,55 @@ public class RPCCommandServlet extends HTTPServletBase
         return true;
     }
 
-    protected JSONObject parseJSON(final HttpServletRequest request)
+    protected JSONObject parseJSON(final HttpServletRequest request, final RequestType type)
     {
         JSONObject object = null;
 
-        final JSONParser parser = new JSONParser();
+        final int leng = request.getContentLength();
 
-        try
+        if (leng > 0)
         {
-            final Object parsed = parser.parse(request.getReader());
+            final JSONParser parser = new JSONParser();
 
-            if (parsed instanceof JSONObject)
+            try
             {
-                object = ((JSONObject) parsed);
+                final Object parsed = parser.parse(request.getReader());
+
+                if (parsed instanceof JSONObject)
+                {
+                    object = ((JSONObject) parsed);
+                }
+            }
+            catch (JSONParserException e)
+            {
+                if (type != RequestType.POST)
+                {
+                    logger.error("JSONParserException", e);
+                }
+            }
+            catch (IOException e)
+            {
+                if (type != RequestType.POST)
+                {
+                    logger.error("IOException", e);
+                }
             }
         }
-        catch (JSONParserException e)
+        if ((null == object) && (type != RequestType.POST))
         {
-            logger.error("JSONParserException", e);
+            object = new JSONObject();
         }
-        catch (IOException e)
+        if (((null == object) || (leng == 0)) && (type == RequestType.POST))
         {
-            logger.error("IOException", e);
+            logger.error("Empty body on POST");
         }
         return object;
     }
 
     protected void writeJSON(final HttpServletResponse response, final JSONObject output) throws IOException
     {
+        doNoCache(response);
+
         response.setStatus(HttpServletResponse.SC_OK);
 
         response.setContentType(CONTENT_TYPE_APPLICATION_JSON);

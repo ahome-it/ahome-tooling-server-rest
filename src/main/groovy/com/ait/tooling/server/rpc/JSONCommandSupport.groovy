@@ -17,6 +17,7 @@
 package com.ait.tooling.server.rpc
 
 import groovy.transform.CompileStatic
+import groovy.transform.Memoized
 
 import org.springframework.stereotype.Service
 
@@ -28,21 +29,50 @@ import com.ait.tooling.server.rpc.support.RPCSupport
 @CompileStatic
 public abstract class JSONCommandSupport extends RPCSupport implements IJSONCommand
 {
-    @Override
+    @Memoized
     public String getName()
     {
-        final Class<?> type = getClass()
+        final Class<?> claz = getClass()
 
-        if (type.isAnnotationPresent(Service.class))
+        if (claz.isAnnotationPresent(Service))
         {
-            final String name = StringOps.toTrimOrNull(type.getAnnotation(Service.class).value())
+            final String name = StringOps.toTrimOrNull(claz.getAnnotation(Service).value())
 
             if (name)
             {
                 return name
             }
         }
-        type.getSimpleName().trim()
+        claz.getSimpleName().trim()
+    }
+
+    @Memoized
+    public String getRequestPath()
+    {
+        final Class<?> claz = getClass()
+
+        if (claz.isAnnotationPresent(RequestPath))
+        {
+            final String path = StringOps.toTrimOrNull(claz.getAnnotation(RequestPath).value())
+
+            if (path)
+            {
+                return path
+            }
+        }
+        getName()
+    }
+
+    @Memoized
+    public boolean isRequestOfType(final RequestType type)
+    {
+        final Class<?> claz = getClass()
+
+        if (claz.isAnnotationPresent(RequestMethods))
+        {
+            return Arrays.asList(claz.getAnnotation(RequestMethods).value()).contains(type)
+        }
+        true
     }
 
     @Override
@@ -54,18 +84,18 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     @Override
     public JSONObject getCommandMetaData()
     {
-        json([name: getName(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
+        json([name: getRequestPath(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
     }
 
     @Override
     public JSONSchema getRequestSchema()
     {
-        jsonSchema([title: getName(), description: 'Request Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonSchema([title: getRequestPath(), description: 'Request Schema for ' + getRequestPath(), type: 'object', properties: [:]])
     }
 
     @Override
     public JSONSchema getResponseSchema()
     {
-        jsonSchema([title: getName(), description: 'Response Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonSchema([title: getRequestPath(), description: 'Response Schema for ' + getRequestPath(), type: 'object', properties: [:]])
     }
 }

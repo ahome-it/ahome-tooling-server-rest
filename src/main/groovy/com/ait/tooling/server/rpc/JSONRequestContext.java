@@ -16,6 +16,7 @@
 
 package com.ait.tooling.server.rpc;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -23,8 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.MDC;
-
+import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.core.support.spring.IServerContext;
@@ -38,6 +38,8 @@ public class JSONRequestContext implements IJSONRequestContext
 
     private final String              m_sessid;
 
+    private final RequestType         m_reqtyp;
+
     private final boolean             m_admin;
 
     private final List<String>        m_roles;
@@ -48,21 +50,59 @@ public class JSONRequestContext implements IJSONRequestContext
 
     private final HttpServletResponse m_servlet_response;
 
-    public JSONRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response)
+    public JSONRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response, RequestType reqtyp)
     {
+        m_reqtyp = reqtyp;
+        
         m_userid = userid;
 
         m_sessid = sessid;
 
         m_admin = admin;
 
-        m_roles = roles;
+        m_roles = Collections.unmodifiableList(roles);
 
         m_servlet_context = context;
 
         m_servlet_request = request;
 
         m_servlet_response = response;
+    }
+
+    @Override
+    public boolean isGet()
+    {
+        return (RequestType.GET == getRequestType());
+    }
+
+    @Override
+    public boolean isPut()
+    {
+        return (RequestType.PUT == getRequestType());
+    }
+
+    @Override
+    public boolean isPost()
+    {
+        return (RequestType.POST == getRequestType());
+    }
+
+    @Override
+    public boolean isHead()
+    {
+        return (RequestType.HEAD == getRequestType());
+    }
+
+    @Override
+    public boolean isDelete()
+    {
+        return (RequestType.DELETE == getRequestType());
+    }
+
+    @Override
+    public RequestType getRequestType()
+    {
+        return m_reqtyp;
     }
 
     @Override
@@ -114,7 +154,7 @@ public class JSONRequestContext implements IJSONRequestContext
 
         HttpServletResponse response = getServletResponse();
 
-        if ((null != request) && (null != response) && (null != name) && (false == (name = name.trim()).isEmpty()))
+        if ((null != request) && (null != response) && (null != (name = StringOps.toTrimOrNull(name))))
         {
             if (null == value)
             {
@@ -137,7 +177,7 @@ public class JSONRequestContext implements IJSONRequestContext
             {
                 Cookie cookie = new Cookie(name, value);
 
-                cookie.setMaxAge(60 * 60 * 24 * 365); // one year
+                cookie.setMaxAge(60 * 60 * 24 * 365);// one year
 
                 String ruri = request.getHeader("Referer");
 
@@ -151,12 +191,6 @@ public class JSONRequestContext implements IJSONRequestContext
                 response.addCookie(cookie);
             }
         }
-    }
-
-    @Override
-    public void doResetMDC()
-    {
-        MDC.put("session", ((m_userid == null) ? "no-userid" : m_userid) + "-" + ((m_sessid == null) ? "no-sessid" : m_sessid));
     }
 
     @Override

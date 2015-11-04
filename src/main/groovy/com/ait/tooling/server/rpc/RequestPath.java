@@ -16,25 +16,14 @@
 
 package com.ait.tooling.server.rpc;
 
-import java.io.Closeable;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import com.ait.tooling.common.api.types.INamed;
-import com.ait.tooling.server.core.json.JSONObject;
-import com.ait.tooling.server.core.json.schema.JSONSchema;
-
-public interface IJSONCommand extends INamed, Closeable
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface RequestPath
 {
-    public String getRequestPath();
-
-    public JSONObject execute(IJSONRequestContext context, JSONObject object) throws Exception;
-
-    public JSONObject getValidation();
-
-    public JSONSchema getRequestSchema();
-
-    public JSONSchema getResponseSchema();
-
-    public JSONObject getCommandMetaData();
-    
-    public boolean isRequestOfType(RequestType type);
+    public String value();
 }

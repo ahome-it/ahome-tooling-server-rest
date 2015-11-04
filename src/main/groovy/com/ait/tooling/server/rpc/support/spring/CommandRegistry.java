@@ -53,25 +53,25 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
     {
         if (null != command)
         {
-            final String name = StringOps.requireTrimOrNull(command.getName(), "CommandRegistry.addCommand(name: " + command.getName() + ") blank or null");
+            final String path = StringOps.requireTrimOrNull(command.getRequestPath(), "CommandRegistry.addCommand(path: " + command.getName() + ") blank or null");
 
-            if (null == m_commands.get(name))
+            if (null == m_commands.get(path))
             {
-                m_commands.put(name, command);
+                m_commands.put(path, command);
 
-                logger.info("CommandRegistry.addCommand(" + name + ") Registered");
+                logger.info("CommandRegistry.addCommand(" + path + ") Registered");
             }
             else
             {
-                logger.error("CommandRegistry.addCommand(" + name + ") Duplicate ignored");
+                logger.error("CommandRegistry.addCommand(" + path + ") Duplicate ignored");
             }
         }
     }
 
     @Override
-    public IJSONCommand getCommand(final String name)
+    public IJSONCommand getCommand(final String path)
     {
-        return m_commands.get(StringOps.requireTrimOrNull(name, "CommandRegistry.getCommand(" + name + ") blank or null"));
+        return m_commands.get(StringOps.requireTrimOrNull(path, "CommandRegistry.getCommand(" + path + ") blank or null"));
     }
 
     @Override

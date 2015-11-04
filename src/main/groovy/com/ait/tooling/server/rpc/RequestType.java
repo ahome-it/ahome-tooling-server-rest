@@ -16,25 +16,28 @@
 
 package com.ait.tooling.server.rpc;
 
-import java.io.Closeable;
+import com.ait.tooling.common.api.types.IStringValued;
 
-import com.ait.tooling.common.api.types.INamed;
-import com.ait.tooling.server.core.json.JSONObject;
-import com.ait.tooling.server.core.json.schema.JSONSchema;
-
-public interface IJSONCommand extends INamed, Closeable
+public enum RequestType implements IStringValued
 {
-    public String getRequestPath();
+    GET("GET"), POST("POST"), PUT("PUT"), DELETE("DELETE"), HEAD("HEAD");
 
-    public JSONObject execute(IJSONRequestContext context, JSONObject object) throws Exception;
+    private final String m_value;
 
-    public JSONObject getValidation();
+    private RequestType(final String value)
+    {
+        m_value = value;
+    }
 
-    public JSONSchema getRequestSchema();
+    @Override
+    public String getValue()
+    {
+        return m_value;
+    }
 
-    public JSONSchema getResponseSchema();
-
-    public JSONObject getCommandMetaData();
-    
-    public boolean isRequestOfType(RequestType type);
+    @Override
+    public String toString()
+    {
+        return super.toString();
+    }
 }

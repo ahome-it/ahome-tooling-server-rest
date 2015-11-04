@@ -28,6 +28,18 @@ import com.ait.tooling.server.core.support.spring.IServerContext;
 
 public interface IJSONRequestContext extends Serializable
 {
+    public boolean isGet();
+
+    public boolean isPut();
+
+    public boolean isPost();
+
+    public boolean isHead();
+
+    public boolean isDelete();
+
+    public RequestType getRequestType();
+
     public boolean isAdmin();
 
     public String getUserID();
@@ -43,8 +55,6 @@ public interface IJSONRequestContext extends Serializable
     public HttpServletResponse getServletResponse();
 
     public void setCookie(String name, String value);
-
-    public void doResetMDC();
 
     public JSONObject getJSONHeaders();
 
