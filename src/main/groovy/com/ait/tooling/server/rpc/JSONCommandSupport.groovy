@@ -43,28 +43,23 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
                 return name
             }
         }
-        claz.getSimpleName().trim()
+        claz.getSimpleName()
     }
 
     @Memoized
-    public String getRequestPath()
+    public String getRequestBinding()
     {
         final Class<?> claz = getClass()
 
-        if (claz.isAnnotationPresent(RequestPath))
+        if (claz.isAnnotationPresent(RequestBinding))
         {
-            final String path = StringOps.toTrimOrNull(claz.getAnnotation(RequestPath).value())
-
-            if (path)
-            {
-                return path
-            }
+            return fixRequestBinding(StringOps.toTrimOrNull(claz.getAnnotation(RequestBinding).value()))
         }
-        getName()
+        null
     }
 
     @Memoized
-    public boolean isRequestOfType(final RequestType type)
+    public boolean isRequestTypeValid(RequestType type)
     {
         final Class<?> claz = getClass()
 
@@ -84,18 +79,18 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     @Override
     public JSONObject getCommandMetaData()
     {
-        json([name: getRequestPath(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
+        json([name: getName(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
     }
 
     @Override
     public JSONSchema getRequestSchema()
     {
-        jsonSchema([title: getRequestPath(), description: 'Request Schema for ' + getRequestPath(), type: 'object', properties: [:]])
+        jsonSchema([title: getName(), description: 'Request Schema for ' + getName(), type: 'object', properties: [:]])
     }
 
     @Override
     public JSONSchema getResponseSchema()
     {
-        jsonSchema([title: getRequestPath(), description: 'Response Schema for ' + getRequestPath(), type: 'object', properties: [:]])
+        jsonSchema([title: getName(), description: 'Response Schema for ' + getName(), type: 'object', properties: [:]])
     }
 }

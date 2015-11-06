@@ -26,6 +26,8 @@ public interface ICommandRegistryOf<T extends IJSONCommand> extends Serializable
 {
     public T getCommand(String name);
 
+    public T getBinding(String bind);
+
     public List<String> getCommandNames();
 
     public List<T> getCommands();

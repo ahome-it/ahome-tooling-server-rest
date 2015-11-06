@@ -36,7 +36,6 @@ import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.security.session.IServerSession;
 import com.ait.tooling.server.core.security.session.IServerSessionRepository;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
-import com.ait.tooling.server.core.support.CoreGroovySupport;
 import com.ait.tooling.server.rpc.IJSONCommand;
 import com.ait.tooling.server.rpc.JSONRequestContext;
 import com.ait.tooling.server.rpc.RequestType;
@@ -45,17 +44,14 @@ import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
 public class RPCCommandServlet extends HTTPServletBase
 {
-    private static final long   serialVersionUID = 8890049936686095786L;
+    private static final long   serialVersionUID                   = 8890049936686095786L;
 
-    private static final Logger logger           = Logger.getLogger(RPCCommandServlet.class);
+    private static final Logger logger                             = Logger.getLogger(RPCCommandServlet.class);
+
+    public final static String  SESSION_PROVIDER_DOMAIN_NAME_PARAM = "core.server.session.provider.domain.name";
 
     public RPCCommandServlet()
     {
-    }
-
-    protected String getRPCPathPrefix()
-    {
-        return getServletConfig().getInitParameter("rpc_path_prefix");
     }
 
     @Override
@@ -139,7 +135,7 @@ public class RPCCommandServlet extends HTTPServletBase
         }
         if (null == object)
         {
-            logger.error("passed data is not a JSONObject");
+            logger.error("passed body is not a JSONObject");
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
@@ -147,27 +143,19 @@ public class RPCCommandServlet extends HTTPServletBase
         }
         String name = null;
 
-        boolean body = false;
-
-        boolean lead = false;
+        boolean irpc = false;
 
         if ((read) && isCommandInBody())
         {
-            if (false == object.isDefined("command"))
-            {
-                logger.error("no command key found");
+            irpc = true;
 
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-                return;
-            }
             name = StringOps.toTrimOrNull(object.getAsString("command"));
 
             if (null == name)
             {
-                logger.error("empty command key found");
+                logger.error("no command keys found in body");
 
-                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
                 return;
             }
@@ -178,40 +166,19 @@ public class RPCCommandServlet extends HTTPServletBase
 
             if (null != name)
             {
-                int indx = name.lastIndexOf("/");
+                int indx = name.indexOf("/");
 
-                final String prfx = StringOps.toTrimOrNull(getRPCPathPrefix());
-
-                if (null != prfx)
-                {
-                    indx = name.indexOf(prfx);
-
-                    if (indx >= 0)
-                    {
-                        lead = true;
-
-                        indx = indx + prfx.length();
-                    }
-                }
                 if (indx >= 0)
                 {
                     name = StringOps.toTrimOrNull(name.substring(indx + 1));
                 }
                 if (null != name)
                 {
-                    if (name.endsWith(".rpc"))
+                    if (name.contains(".rpc"))
                     {
-                        body = true;
-
-                        name = StringOps.toTrimOrNull(name.substring(0, name.length() - 4));
+                        irpc = true;
                     }
-                    if (lead)
-                    {
-                        if (false == name.startsWith("/"))
-                        {
-                            name = "/" + name;
-                        }
-                    }
+                    name = getRPCContext().fixRequestBinding(name);
                 }
             }
             if (null == name)
@@ -223,17 +190,22 @@ public class RPCCommandServlet extends HTTPServletBase
                 return;
             }
         }
-        final IJSONCommand command = getRPCContext().getCommand(name);
+        IJSONCommand command = getRPCContext().getCommand(name);
 
         if (null == command)
         {
-            logger.error("command not found " + name);
+            command = getRPCContext().getBinding(name);
 
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            if (null == command)
+            {
+                logger.error("command or binding not found " + name);
 
-            return;
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+                return;
+            }
         }
-        if (false == command.isRequestOfType(type))
+        if (false == command.isRequestTypeValid(type))
         {
             logger.error("command " + name + " not type " + type);
 
@@ -241,7 +213,7 @@ public class RPCCommandServlet extends HTTPServletBase
 
             return;
         }
-        if ((read) && (body))
+        if ((read) && (irpc))
         {
             if (false == object.isDefined("request"))
             {
@@ -266,9 +238,7 @@ public class RPCCommandServlet extends HTTPServletBase
 
         if (null != sessid)
         {
-            final String domain_name = StringOps.toTrimOrNull(getServletConfig().getInitParameter("session_domain_name"));
-
-            final IServerSessionRepository repository = getServerContext().getServerSessionRepository((domain_name == null) ? "default" : domain_name);
+            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
 
             if (null != repository)
             {
@@ -310,13 +280,13 @@ public class RPCCommandServlet extends HTTPServletBase
 
             if (done < 1)
             {
-                logger.info("calling command " + name + " took " + fast + "nano's");
+                logger.info("calling command " + name + " took " + fast + " nano's");
             }
             else
             {
-                logger.info("calling command " + name + " took " + done + "ms's");
+                logger.info("calling command " + name + " took " + done + " ms's");
             }
-            if (body)
+            if (irpc)
             {
                 writeJSON(response, new JSONObject("result", result));
             }
@@ -406,11 +376,22 @@ public class RPCCommandServlet extends HTTPServletBase
 
     protected boolean isRunning()
     {
-        return CoreGroovySupport.getCoreGroovySupport().getCoreServerManager().isRunning();
+        return getRPCContext().getCoreServerManager().isRunning();
     }
 
     protected final IRPCContext getRPCContext()
     {
         return RPCContextInstance.getRPCContextInstance();
+    }
+
+    protected String getSessionProviderDomainName()
+    {
+        String name = StringOps.toTrimOrNull(getInitParameter(SESSION_PROVIDER_DOMAIN_NAME_PARAM));
+
+        if (null == name)
+        {
+            return "default";
+        }
+        return name;
     }
 }

@@ -24,7 +24,7 @@ import com.ait.tooling.server.core.json.schema.JSONSchema;
 
 public interface IJSONCommand extends INamed, Closeable
 {
-    public String getRequestPath();
+    public String getRequestBinding();
 
     public JSONObject execute(IJSONRequestContext context, JSONObject object) throws Exception;
 
@@ -36,5 +36,5 @@ public interface IJSONCommand extends INamed, Closeable
 
     public JSONObject getCommandMetaData();
     
-    public boolean isRequestOfType(RequestType type);
+    public boolean isRequestTypeValid(RequestType type);
 }

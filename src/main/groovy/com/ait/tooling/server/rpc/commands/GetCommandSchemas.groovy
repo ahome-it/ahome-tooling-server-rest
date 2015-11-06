@@ -46,18 +46,18 @@ public class GetCommandSchemas extends JSONCommandSupport
             {
                 if (auth.isAuthorized())
                 {
-                    return json([schemas: [name: command.getRequestPath(), request: command.getRequestSchema(), response: command.getResponseSchema()]])
+                    return json([schemas: [name: command.getName(), request: command.getRequestSchema(), response: command.getResponseSchema()]])
                 }
                 else
                 {
-                    return json([error: auth.getText(), name: command.getRequestPath()])
+                    return json(error: auth.getText(), name: command.getName())
                 }
             }
             else
             {
-                return json([error: 'Missing or null AuthroizationResult', name: command.getRequestPath()])
+                return json(error: 'Missing or null AuthroizationResult', name: command.getName())
             }
         }
-        json([error: 'Not found', name: command.getRequestPath()])
+        json(error: 'Not found', name: command.getName())
     }
 }

@@ -45,6 +45,8 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
 
     private final LinkedHashMap<String, IJSONCommand> m_commands       = new LinkedHashMap<String, IJSONCommand>();
 
+    private final LinkedHashMap<String, IJSONCommand> m_bindings       = new LinkedHashMap<String, IJSONCommand>();
+
     public CommandRegistry()
     {
     }
@@ -53,25 +55,95 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
     {
         if (null != command)
         {
-            final String path = StringOps.requireTrimOrNull(command.getRequestPath(), "CommandRegistry.addCommand(path: " + command.getName() + ") blank or null");
+            String name = StringOps.toTrimOrNull(command.getName());
 
-            if (null == m_commands.get(path))
+            if (null != name)
             {
-                m_commands.put(path, command);
+                if (null == m_commands.get(name))
+                {
+                    m_commands.put(name, command);
 
-                logger.info("CommandRegistry.addCommand(" + path + ") Registered");
+                    logger.info("CommandRegistry.addCommand(" + name + ") Command Registered");
+                }
+                else
+                {
+                    logger.error("CommandRegistry.addCommand(" + name + ") Duplicate command ignored");
+                }
             }
             else
             {
-                logger.error("CommandRegistry.addCommand(" + path + ") Duplicate ignored");
+                logger.error("CommandRegistry.addCommand(" + command.getClass().getSimpleName() + ") has null or empty name.");
             }
+            String bind = StringOps.toTrimOrNull(command.getRequestBinding());
+
+            if (null != bind)
+            {
+                if (null == m_bindings.get(bind))
+                {
+                    m_bindings.put(bind, command);
+
+                    logger.info("CommandRegistry.addCommand(" + bind + ") Binding Registered");
+                }
+                else
+                {
+                    logger.error("CommandRegistry.addCommand(" + bind + ") Duplicate binding ignored");
+                }
+            }
+            if ((null != name) && (null == bind))
+            {
+                bind = "/" + name;
+
+                if (null == m_bindings.get(bind))
+                {
+                    m_bindings.put(bind, command);
+
+                    logger.info("CommandRegistry.addCommand(" + bind + ") Binding Registered");
+                }
+                else
+                {
+                    logger.error("CommandRegistry.addCommand(" + bind + ") Duplicate binding ignored");
+                }
+            }
+        }
+        else
+        {
+            logger.error("CommandRegistry.addCommand(null)");
         }
     }
 
     @Override
-    public IJSONCommand getCommand(final String path)
+    public IJSONCommand getCommand(String name)
     {
-        return m_commands.get(StringOps.requireTrimOrNull(path, "CommandRegistry.getCommand(" + path + ") blank or null"));
+        name = StringOps.toTrimOrNull(name);
+
+        if (null != name)
+        {
+            if (name.startsWith("/"))
+            {
+                name = StringOps.toTrimOrNull(name.substring(1));
+            }
+            if (null != name)
+            {
+                return m_commands.get(name);
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public IJSONCommand getBinding(String bind)
+    {
+        bind = StringOps.toTrimOrNull(bind);
+
+        if (null != bind)
+        {
+            if (false == bind.startsWith("/"))
+            {
+                bind = "/" + bind;
+            }
+            return m_bindings.get(bind);
+        }
+        return null;
     }
 
     @Override

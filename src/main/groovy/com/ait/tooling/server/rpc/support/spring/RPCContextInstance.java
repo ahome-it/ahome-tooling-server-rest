@@ -18,6 +18,7 @@ package com.ait.tooling.server.rpc.support.spring;
 
 import java.util.Objects;
 
+import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.server.core.support.spring.ServerContextInstance;
 import com.ait.tooling.server.rpc.IJSONCommand;
 
@@ -47,4 +48,43 @@ public class RPCContextInstance extends ServerContextInstance implements IRPCCon
     {
         return getCommandRegistry().getCommand(Objects.requireNonNull(name));
     }
+
+    @Override
+    public IJSONCommand getBinding(final String bind)
+    {
+        return getCommandRegistry().getBinding(Objects.requireNonNull(bind));
+    }
+
+    @Override
+    public String fixRequestBinding(String bind)
+    {
+        bind = StringOps.toTrimOrNull(bind);
+
+        if (null != bind)
+        {
+            String temp = bind.replaceAll("//", "/").replaceAll("\\s", "");
+
+            while (false == temp.equals(bind))
+            {
+                bind = temp;
+
+                temp = bind.replaceAll("//", "/");
+            }
+            if (false == bind.startsWith("/"))
+            {
+                bind = "/" + bind;
+            }
+            if (bind.endsWith("/"))
+            {
+                bind = bind.substring(0, bind.length() - 1);
+            }
+            if (bind.endsWith(".rpc"))
+            {
+                bind = bind.substring(0, bind.length() - 4);
+            }
+            bind = StringOps.toTrimOrNull(bind);
+        }
+        return bind;
+    }
+
 }

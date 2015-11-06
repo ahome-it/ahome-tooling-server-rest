@@ -21,7 +21,11 @@ import com.ait.tooling.server.rpc.IJSONCommand;
 
 public interface IRPCContext extends IServerContext
 {
-    public ICommandRegistry getCommandRegistry();
-
     public IJSONCommand getCommand(String name);
+
+    public IJSONCommand getBinding(String bind);
+
+    public String fixRequestBinding(String bind);
+
+    public ICommandRegistry getCommandRegistry();
 }

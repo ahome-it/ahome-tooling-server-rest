@@ -55,4 +55,16 @@ public class RPCSupport extends CoreGroovySupport implements Serializable
     {
         getCommandRegistry().getCommand(name)
     }
+
+    @Memoized
+    public IJSONCommand getBinding(String bind)
+    {
+        getCommandRegistry().getBinding(bind)
+    }
+
+    @Memoized
+    public String fixRequestBinding(String bind)
+    {
+        getRPCContext().fixRequestBinding(bind)
+    }
 }

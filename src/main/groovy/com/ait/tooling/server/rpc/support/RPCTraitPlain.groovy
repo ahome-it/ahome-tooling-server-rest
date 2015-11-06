@@ -40,4 +40,14 @@ public trait RPCTraitPlain
     {
         getCommandRegistry().getCommand(name)
     }
+
+    public IJSONCommand getBinding(String bind)
+    {
+        getCommandRegistry().getBinding(bind)
+    }
+
+    public String fixRequestBinding(String bind)
+    {
+        getRPCContext().fixRequestBinding(bind)
+    }
 }
