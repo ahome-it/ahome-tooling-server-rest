@@ -28,13 +28,11 @@ public interface IJSONCommand extends INamed, Closeable
 
     public JSONObject execute(IJSONRequestContext context, JSONObject object) throws Exception;
 
-    public JSONObject getValidation();
+    public JSONObject getSchemas();
 
     public JSONSchema getRequestSchema();
 
     public JSONSchema getResponseSchema();
-
-    public JSONObject getCommandMetaData();
     
     public boolean isRequestTypeValid(RequestType type);
 }

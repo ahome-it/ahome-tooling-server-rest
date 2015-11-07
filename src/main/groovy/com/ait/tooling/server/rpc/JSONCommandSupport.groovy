@@ -71,26 +71,20 @@ public abstract class JSONCommandSupport extends RPCSupport implements IJSONComm
     }
 
     @Override
-    public JSONObject getValidation()
+    public JSONObject getSchemas()
     {
-        json([request: false, response: false])
-    }
-
-    @Override
-    public JSONObject getCommandMetaData()
-    {
-        json([name: getName(), validation: getValidation(), request: getRequestSchema(), response: getResponseSchema()])
+        json(request: getRequestSchema(), response: getResponseSchema())
     }
 
     @Override
     public JSONSchema getRequestSchema()
     {
-        jsonSchema([title: getName(), description: 'Request Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonSchema(type: 'object', properties: [:])
     }
 
     @Override
     public JSONSchema getResponseSchema()
     {
-        jsonSchema([title: getName(), description: 'Response Schema for ' + getName(), type: 'object', properties: [:]])
+        jsonSchema(type: 'object', properties: [:])
     }
 }

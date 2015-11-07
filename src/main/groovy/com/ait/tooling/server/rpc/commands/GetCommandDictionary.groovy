@@ -47,7 +47,7 @@ public class GetCommandDictionary extends JSONCommandSupport
 
                 if ((auth) && (auth.isAuthorized()))
                 {
-                    list << command.getCommandMetaData()
+                    list << command.getName()
                 }
             }
         }
