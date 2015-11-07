@@ -44,45 +44,16 @@ import com.ait.tooling.server.rpc.support.spring.RPCContextInstance;
 
 public class RPCCommandServlet extends HTTPServletBase
 {
-    private static final long   serialVersionUID                   = 8890049936686095786L;
+    private static final long   serialVersionUID = 8890049936686095786L;
 
-    private static final Logger logger                             = Logger.getLogger(RPCCommandServlet.class);
-
-    public final static String  SESSION_PROVIDER_DOMAIN_NAME_PARAM = "core.server.session.provider.domain.name";
+    private static final Logger logger           = Logger.getLogger(RPCCommandServlet.class);
 
     public RPCCommandServlet()
     {
     }
 
     @Override
-    public void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
-    {
-        if (false == isRunning())
-        {
-            logger.error("server is suspended, refuse command request");
-
-            response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
-
-            return;
-        }
-        super.service(request, response);
-    }
-
-    protected void doNoCache(final HttpServletResponse response)
-    {
-        final long time = System.currentTimeMillis();
-
-        response.setDateHeader(DATE_HEADER, time);
-
-        response.setDateHeader(EXPIRES_HEADER, time - 31536000000L);
-
-        response.setHeader(PRAGMA_HEADER, "no-cache");
-
-        response.setHeader(CACHE_CONTROL_HEADER, "no-cache, no-store, must-revalidate");
-    }
-
-    @Override
-    public void doHead(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    public void doHead(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
         doNoCache(response);
 
@@ -92,34 +63,34 @@ public class RPCCommandServlet extends HTTPServletBase
     }
 
     @Override
-    public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
         doCommand(request, response, false, RequestType.GET, getJSONParametersFromRequest(request));
     }
 
     @Override
-    public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
         doCommand(request, response, true, RequestType.PUT, null);
     }
 
     @Override
-    public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
         doCommand(request, response, true, RequestType.POST, null);
     }
 
     @Override
-    public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws IOException
+    public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
         doCommand(request, response, true, RequestType.DELETE, null);
     }
 
-    protected void doCommand(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestType type, JSONObject object) throws IOException
+    protected void doCommand(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestType type, JSONObject object) throws ServletException, IOException
     {
         if (false == isRunning())
         {
-            logger.error("server is suspended, refuse command request");
+            logger.error("server is suspended, refused request");
 
             response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 
@@ -374,24 +345,8 @@ public class RPCCommandServlet extends HTTPServletBase
         buff.flush();
     }
 
-    protected boolean isRunning()
-    {
-        return getRPCContext().getCoreServerManager().isRunning();
-    }
-
     protected final IRPCContext getRPCContext()
     {
         return RPCContextInstance.getRPCContextInstance();
-    }
-
-    protected String getSessionProviderDomainName()
-    {
-        String name = StringOps.toTrimOrNull(getInitParameter(SESSION_PROVIDER_DOMAIN_NAME_PARAM));
-
-        if (null == name)
-        {
-            return "default";
-        }
-        return name;
     }
 }
