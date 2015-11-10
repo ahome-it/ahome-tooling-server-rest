@@ -21,8 +21,9 @@ import java.io.Closeable;
 import com.ait.tooling.common.api.types.INamed;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.json.schema.JSONSchema;
+import com.ait.tooling.server.core.locking.IRateLimited;
 
-public interface IJSONCommand extends INamed, Closeable
+public interface IJSONCommand extends INamed, IRateLimited, Closeable
 {
     public String getRequestBinding();
 

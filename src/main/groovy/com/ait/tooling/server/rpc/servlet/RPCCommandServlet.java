@@ -52,6 +52,11 @@ public class RPCCommandServlet extends HTTPServletBase
     {
     }
 
+    protected RPCCommandServlet(final double rate)
+    {
+        super(rate);
+    }
+
     @Override
     public void doHead(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
@@ -96,10 +101,6 @@ public class RPCCommandServlet extends HTTPServletBase
 
             return;
         }
-        final String userid = StringOps.toTrimOrNull(request.getHeader(X_USER_ID_HEADER));
-
-        final String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
-
         if (read)
         {
             object = parseJSON(request, type);
@@ -205,7 +206,13 @@ public class RPCCommandServlet extends HTTPServletBase
                 return;
             }
         }
-        List<String> roles = null;
+        List<String> uroles = null;
+
+        String userid = StringOps.toTrimOrNull(request.getHeader(X_USER_ID_HEADER));
+
+        String sessid = StringOps.toTrimOrNull(request.getHeader(X_SESSION_ID_HEADER));
+
+        String ctoken = StringOps.toTrimOrNull(request.getHeader(X_CLIENT_API_TOKEN_HEADER));
 
         if (null != sessid)
         {
@@ -217,31 +224,55 @@ public class RPCCommandServlet extends HTTPServletBase
 
                 if ((null != session) && (false == session.isExpired()))
                 {
-                    roles = session.getRoles();
+                    uroles = session.getRoles();
                 }
             }
         }
-        if (null == roles)
+        else if (null != ctoken)
         {
-            roles = new ArrayList<String>(0);
+            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
+
+            if (null != repository)
+            {
+                final IServerSession session = repository.createSession(new JSONObject(X_CLIENT_API_TOKEN_HEADER, ctoken));
+
+                if ((null != session) && (false == session.isExpired()))
+                {
+                    uroles = session.getRoles();
+                    
+                    sessid = StringOps.toTrimOrNull(session.getId());
+
+                    userid = StringOps.toTrimOrNull(session.getUserId());
+                }
+            }
         }
-        final AuthorizationResult resp = isAuthorized(command, roles);
+        if (null == uroles)
+        {
+            uroles = new ArrayList<String>(0);
+        }
+        final AuthorizationResult resp = isAuthorized(command, uroles);
 
         if (false == resp.isAuthorized())
         {
+            if (null == userid)
+            {
+                userid = UNKNOWN_USER;
+            }
             logger.error("service authorization failed " + name + " for user " + userid + " code " + resp.getText());
 
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
             return;
         }
-        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), roles, getServletContext(), request, response, type);
+        final JSONRequestContext context = new JSONRequestContext(userid, sessid, resp.isAdmin(), uroles, getServletContext(), request, response, type);
 
         try
         {
             final long tick = System.currentTimeMillis();
 
             final long time = System.nanoTime();
+
+            command.acquire();
 
             final JSONObject result = command.execute(context, object);
 

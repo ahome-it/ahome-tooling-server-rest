@@ -118,14 +118,7 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
 
         if (null != name)
         {
-            if (name.startsWith("/"))
-            {
-                name = StringOps.toTrimOrNull(name.substring(1));
-            }
-            if (null != name)
-            {
-                return m_commands.get(name);
-            }
+            return m_commands.get(name);
         }
         return null;
     }
@@ -152,6 +145,14 @@ public class CommandRegistry implements ICommandRegistry, BeanFactoryAware
     {
         return Collections.unmodifiableList(new ArrayList<String>(m_commands.keySet()));
     }
+    
+    @Override
+    @ManagedAttribute(description = "Get IJSONCommand RequestBindings.")
+    public List<String> getRequestBindings()
+    {
+        return Collections.unmodifiableList(new ArrayList<String>(m_bindings.keySet()));
+    }
+
 
     @Override
     public List<IJSONCommand> getCommands()

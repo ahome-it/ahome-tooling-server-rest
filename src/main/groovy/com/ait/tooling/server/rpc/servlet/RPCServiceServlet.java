@@ -24,6 +24,12 @@ public class RPCServiceServlet extends RPCCommandServlet
     {
     }
 
+    protected RPCServiceServlet(final double rate)
+    {
+        super(rate);
+    }
+
+    @Override
     protected boolean isCommandInBody()
     {
         return false;

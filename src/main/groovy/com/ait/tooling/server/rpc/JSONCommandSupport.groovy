@@ -24,11 +24,29 @@ import org.springframework.stereotype.Service
 import com.ait.tooling.common.api.java.util.StringOps
 import com.ait.tooling.server.core.json.JSONObject
 import com.ait.tooling.server.core.json.schema.JSONSchema
+import com.ait.tooling.server.core.locking.IRateLimited.RateLimiterFactory
 import com.ait.tooling.server.rpc.support.RPCSupport
+import com.google.common.util.concurrent.RateLimiter
 
 @CompileStatic
 public abstract class JSONCommandSupport extends RPCSupport implements IJSONCommand
 {
+    private final RateLimiter   m_ratelimit
+
+    public JSONCommandSupport()
+    {
+        m_ratelimit = RateLimiterFactory.create(getClass())
+    }
+
+    @Override
+    public void acquire()
+    {
+        if (m_ratelimit)
+        {
+            m_ratelimit.acquire()
+        }
+    }
+
     @Memoized
     public String getName()
     {
