@@ -31,11 +31,19 @@ import com.google.common.util.concurrent.RateLimiter
 @CompileStatic
 public abstract class RESTServiceSupport extends RESTSupport implements IRESTService
 {
-    private final RateLimiter   m_ratelimit
+    private RateLimiter m_ratelimit
 
     public RESTServiceSupport()
     {
         m_ratelimit = RateLimiterFactory.create(getClass())
+
+        if (null == m_ratelimit)
+        {
+            if (getClass().isAnnotationPresent(RESTSpecification))
+            {
+                m_ratelimit = RateLimiterFactory.create(getClass().getAnnotation(RESTSpecification).rateLimit())
+            }
+        }
     }
 
     @Override
@@ -73,19 +81,33 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
         {
             return fixRequestBinding(StringOps.toTrimOrNull(claz.getAnnotation(RequestBinding).value()))
         }
+        if (claz.isAnnotationPresent(RESTSpecification))
+        {
+            return fixRequestBinding(StringOps.toTrimOrNull(claz.getAnnotation(RESTSpecification).requestBinding()))
+        }
         null
     }
 
     @Memoized
-    public boolean isRequestTypeValid(RequestType type)
+    public RequestType[] getRequestTypes()
     {
         final Class<?> claz = getClass()
 
         if (claz.isAnnotationPresent(RequestMethods))
         {
-            return Arrays.asList(claz.getAnnotation(RequestMethods).value()).contains(type)
+            return claz.getAnnotation(RequestMethods).value()
         }
-        true
+        if (claz.isAnnotationPresent(RESTSpecification))
+        {
+            return claz.getAnnotation(RESTSpecification).requestType()
+        }
+        RequestType.getDefaultRequestType()
+    }
+
+    @Memoized
+    public boolean isRequestTypeValid(RequestType type)
+    {
+        getRequestTypes().contains(type)
     }
 
     @Override
@@ -107,8 +129,16 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     }
 
     @Override
-    public JSONObject swagger()
+    public JSONObject getSwaggerAttributes()
     {
-        getSchemas()
+        def list = []
+
+        def path = getRequestBinding() ?: fixRequestBinding(getName())
+
+        getRequestTypes().each { RequestType type ->
+
+            list << type.toString()
+        }
+        json(path: path, methods: list, schemas: getSchemas())
     }
 }

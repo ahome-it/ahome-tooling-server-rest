@@ -22,42 +22,23 @@ import org.springframework.stereotype.Service
 
 import com.ait.tooling.common.api.java.util.StringOps
 import com.ait.tooling.server.core.json.JSONObject
-import com.ait.tooling.server.core.security.AuthorizationResult
-import com.ait.tooling.server.core.security.Authorized
-import com.ait.tooling.server.rest.IRESTService
-import com.ait.tooling.server.rest.IRESTRequestContext
-import com.ait.tooling.server.rest.RESTServiceSupport
+import com.ait.tooling.server.rest.*
 
 @Service
-@Authorized
 @CompileStatic
-public class GetServiceSchemas extends RESTServiceSupport
+@RequestMethods(RequestType.POST)
+@RequestBinding('/system/service/schema')
+public class GetServiceSchema extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        final IRESTService service = getService(StringOps.requireTrimOrNull(object.getAsString('name'), 'Field [name] missing, null, or empty in request'))
+        final IRESTService service = getService(StringOps.requireTrimOrNull(object.getAsString('service'), 'Field [service] missing, null, or empty in request'))
 
         if (service)
         {
-            final AuthorizationResult auth = isAuthorized(service, context.getUserRoles())
-
-            if (auth)
-            {
-                if (auth.isAuthorized())
-                {
-                    return json(schemas: getSchemas())
-                }
-                else
-                {
-                    return json(error: auth.getText())
-                }
-            }
-            else
-            {
-                return json(error: 'null AuthroizationResult')
-            }
+            return json(schemas: service.getSchemas())
         }
-        json(error: 'not found')
+        json(error: object.getAsString('service'))
     }
 }

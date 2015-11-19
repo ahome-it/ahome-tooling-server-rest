@@ -21,36 +21,17 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.server.core.json.JSONObject
-import com.ait.tooling.server.core.security.AuthorizationResult
-import com.ait.tooling.server.core.security.Authorized
-import com.ait.tooling.server.rest.IRESTService
-import com.ait.tooling.server.rest.IRESTRequestContext
-import com.ait.tooling.server.rest.RESTServiceSupport
+import com.ait.tooling.server.rest.*
 
 @Service
-@Authorized
 @CompileStatic
-public class GetServiceDictionary extends RESTServiceSupport
+@RequestMethods(RequestType.GET)
+@RequestBinding('/system/service/names')
+public class GetServiceNames extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        final List list = []
-
-        final List<String> roles = context.getUserRoles()
-
-        getServices().each { IRESTService service ->
-
-            if (service)
-            {
-                final AuthorizationResult auth = isAuthorized(service, roles)
-
-                if ((auth) && (auth.isAuthorized()))
-                {
-                    list << service.getName()
-                }
-            }
-        }
-        json(list)
+        json(names: getServiceRegistry().getServiceNames())
     }
 }

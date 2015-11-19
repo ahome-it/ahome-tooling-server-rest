@@ -21,28 +21,17 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.server.core.json.JSONObject
-import com.ait.tooling.server.rest.IRESTRequestContext
-import com.ait.tooling.server.rest.IRESTService
-import com.ait.tooling.server.rest.RESTServiceSupport
-import com.ait.tooling.server.rest.RequestBinding
+import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
-@RequestBinding('/system/swagger/api')
-public class GetSwaggerAPI extends RESTServiceSupport
+@RequestMethods(RequestType.GET)
+@RequestBinding('/system/service/paths')
+public class GetServicePaths extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        final List list = []
-
-        getServices().each { IRESTService service ->
-
-            if (service)
-            {
-                list << service.getSwaggerAttributes()
-            }
-        }
-        json(swagger: '2.0', links: list)
+        json(paths: getServiceRegistry().getRequestBindings())
     }
 }

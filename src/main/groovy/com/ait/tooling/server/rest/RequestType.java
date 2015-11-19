@@ -40,4 +40,14 @@ public enum RequestType implements IStringValued
     {
         return super.toString();
     }
+    
+    public static final RequestType[] getListOfRequestTypes()
+    {
+        return new RequestType[] {POST, GET, PUT, DELETE};
+    }
+    
+    public static final RequestType[] getDefaultRequestType()
+    {
+        return new RequestType[] {GET};
+    }
 }
