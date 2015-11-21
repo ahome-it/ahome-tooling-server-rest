@@ -32,7 +32,7 @@ public interface IRESTRequestContext extends Serializable
 
     public JSONObject getJSONParameters();
 
-    public RequestType getRequestType();
+    public RequestMethodType getRequestType();
 
     public IRESTContext getRESTContext();
 

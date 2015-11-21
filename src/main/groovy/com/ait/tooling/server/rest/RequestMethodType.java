@@ -18,13 +18,13 @@ package com.ait.tooling.server.rest;
 
 import com.ait.tooling.common.api.types.IStringValued;
 
-public enum RequestType implements IStringValued
+public enum RequestMethodType implements IStringValued
 {
     GET("GET"), POST("POST"), PUT("PUT"), DELETE("DELETE"), HEAD("HEAD");
 
     private final String m_value;
 
-    private RequestType(final String value)
+    private RequestMethodType(final String value)
     {
         m_value = value;
     }
@@ -41,13 +41,13 @@ public enum RequestType implements IStringValued
         return super.toString();
     }
     
-    public static final RequestType[] getListOfRequestTypes()
+    public static final RequestMethodType[] getListOfRequestMethodTypes()
     {
-        return new RequestType[] {POST, GET, PUT, DELETE};
+        return new RequestMethodType[] {POST, GET, PUT, DELETE};
     }
     
-    public static final RequestType[] getDefaultRequestType()
+    public static final RequestMethodType getDefaultRequestMethodType()
     {
-        return new RequestType[] {GET};
+        return GET;
     }
 }

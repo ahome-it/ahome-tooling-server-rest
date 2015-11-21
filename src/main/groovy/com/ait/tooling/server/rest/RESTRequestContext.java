@@ -40,7 +40,7 @@ public class RESTRequestContext implements IRESTRequestContext
 
     private final String              m_sessid;
 
-    private final RequestType         m_reqtyp;
+    private final RequestMethodType         m_reqtyp;
 
     private final boolean             m_admin;
 
@@ -52,7 +52,7 @@ public class RESTRequestContext implements IRESTRequestContext
 
     private final HttpServletResponse m_servlet_response;
 
-    public RESTRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response, RequestType reqtyp)
+    public RESTRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response, RequestMethodType reqtyp)
     {
         m_closed = false;
 
@@ -76,35 +76,35 @@ public class RESTRequestContext implements IRESTRequestContext
     @Override
     public boolean isGet()
     {
-        return (RequestType.GET == getRequestType());
+        return (RequestMethodType.GET == getRequestType());
     }
 
     @Override
     public boolean isPut()
     {
-        return (RequestType.PUT == getRequestType());
+        return (RequestMethodType.PUT == getRequestType());
     }
 
     @Override
     public boolean isPost()
     {
-        return (RequestType.POST == getRequestType());
+        return (RequestMethodType.POST == getRequestType());
     }
 
     @Override
     public boolean isHead()
     {
-        return (RequestType.HEAD == getRequestType());
+        return (RequestMethodType.HEAD == getRequestType());
     }
 
     @Override
     public boolean isDelete()
     {
-        return (RequestType.DELETE == getRequestType());
+        return (RequestMethodType.DELETE == getRequestType());
     }
 
     @Override
-    public RequestType getRequestType()
+    public RequestMethodType getRequestType()
     {
         return m_reqtyp;
     }

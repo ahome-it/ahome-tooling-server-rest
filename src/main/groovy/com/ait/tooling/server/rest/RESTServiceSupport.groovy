@@ -89,25 +89,25 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     }
 
     @Memoized
-    public RequestType[] getRequestTypes()
+    public RequestMethodType getRequestMethodType()
     {
         final Class<?> claz = getClass()
 
-        if (claz.isAnnotationPresent(RequestMethods))
+        if (claz.isAnnotationPresent(RequestMethod))
         {
-            return claz.getAnnotation(RequestMethods).value()
+            return claz.getAnnotation(RequestMethod).value()
         }
         if (claz.isAnnotationPresent(RESTSpecification))
         {
             return claz.getAnnotation(RESTSpecification).requestType()
         }
-        RequestType.getDefaultRequestType()
+        RequestMethodType.getDefaultRequestMethodType()
     }
 
     @Memoized
-    public boolean isRequestTypeValid(RequestType type)
+    public boolean isRequestTypeValid(RequestMethodType type)
     {
-        getRequestTypes().contains(type)
+        getRequestMethodType() == type
     }
 
     @Override
@@ -131,14 +131,6 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     @Override
     public JSONObject getSwaggerAttributes()
     {
-        def list = []
-
-        def path = getRequestBinding() ?: fixRequestBinding(getName())
-
-        getRequestTypes().each { RequestType type ->
-
-            list << type.toString()
-        }
-        json(path: path, methods: list, schemas: getSchemas())
+        json(path: getRequestBinding() ?: fixRequestBinding(getName()), method: getRequestMethodType().toString(), schemas: getSchemas())
     }
 }

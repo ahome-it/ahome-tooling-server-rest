@@ -25,7 +25,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RESTSpecification
 {
-    public RequestType[] requestType() default RequestType.GET;
+    public RequestMethodType requestType() default RequestMethodType.GET;
     
     public String requestBinding() default "";
     

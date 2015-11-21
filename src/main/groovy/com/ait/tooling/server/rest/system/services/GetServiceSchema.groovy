@@ -26,7 +26,7 @@ import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
-@RequestMethods(RequestType.POST)
+@RequestMethod(RequestMethodType.POST)
 @RequestBinding('/system/service/schema')
 public class GetServiceSchema extends RESTServiceSupport
 {

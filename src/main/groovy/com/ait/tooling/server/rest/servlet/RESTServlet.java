@@ -38,7 +38,7 @@ import com.ait.tooling.server.core.security.session.IServerSessionRepository;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.rest.IRESTService;
 import com.ait.tooling.server.rest.RESTRequestContext;
-import com.ait.tooling.server.rest.RequestType;
+import com.ait.tooling.server.rest.RequestMethodType;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
 
@@ -70,28 +70,28 @@ public class RESTServlet extends HTTPServletBase
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, false, RequestType.GET, getJSONParametersFromRequest(request));
+        doService(request, response, false, RequestMethodType.GET, getJSONParametersFromRequest(request));
     }
 
     @Override
     public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestType.PUT, null);
+        doService(request, response, true, RequestMethodType.PUT, null);
     }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestType.POST, null);
+        doService(request, response, true, RequestMethodType.POST, null);
     }
 
     @Override
     public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestType.DELETE, null);
+        doService(request, response, true, RequestMethodType.DELETE, null);
     }
 
-    protected void doService(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestType type, JSONObject object) throws ServletException, IOException
+    protected void doService(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestMethodType type, JSONObject object) throws ServletException, IOException
     {
         if (false == isRunning())
         {
@@ -320,7 +320,7 @@ public class RESTServlet extends HTTPServletBase
         return false;
     }
 
-    protected JSONObject parseJSON(final HttpServletRequest request, final RequestType type)
+    protected JSONObject parseJSON(final HttpServletRequest request, final RequestMethodType type)
     {
         JSONObject object = null;
 
@@ -341,24 +341,24 @@ public class RESTServlet extends HTTPServletBase
             }
             catch (JSONParserException e)
             {
-                if (type != RequestType.POST)
+                if (type != RequestMethodType.POST)
                 {
                     logger.error("JSONParserException", e);
                 }
             }
             catch (IOException e)
             {
-                if (type != RequestType.POST)
+                if (type != RequestMethodType.POST)
                 {
                     logger.error("IOException", e);
                 }
             }
         }
-        if ((null == object) && (type != RequestType.POST))
+        if ((null == object) && (type != RequestMethodType.POST))
         {
             object = new JSONObject();
         }
-        if (((null == object) || (leng == 0)) && (type == RequestType.POST))
+        if (((null == object) || (leng == 0)) && (type == RequestMethodType.POST))
         {
             logger.error("Empty body on POST");
         }
