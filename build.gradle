@@ -41,7 +41,7 @@ sourceCompatibility = 1.8
 
 targetCompatibility = 1.8
 
-version = '1.0.133-SNAPSHOT'
+version = '1.0.134-SNAPSHOT'
 
 group = 'com.ahome-it'
 
@@ -110,7 +110,7 @@ def String getProjectTitle() {
 }
 
 def String getProjectCommonName() {
-    'Ahome Tooling Server RPC'
+    'Ahome Tooling Server REST'
 }
 
 def getBuildModuleVersion() {
@@ -199,7 +199,7 @@ tasks.withType(GroovyCompile) {
 }
 
 dependencies {
-    compile(group: 'com.ahome-it', name: 'ahome-tooling-server-core', version: '1.0.133-SNAPSHOT')
+    compile(group: 'com.ahome-it', name: 'ahome-tooling-server-core', version: '1.0.134-SNAPSHOT')
     testCompile(group: 'log4j', name: 'log4j', version: '1.2.17')
     testCompile(group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.12')
     testCompile(group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.12')
@@ -225,14 +225,14 @@ uploadArchives {
                 authentication(userName: "${sonatype_user}", password: "${sonatype_password}")
             }
             pom.project {
-                name 'Ahome-Tooling-Server-RPC'
+                name 'Ahome-Tooling-Server-REST'
                 packaging 'jar'
-                description 'Ahome Tooling Server RPC'
-                url 'https://github.com/ahome-it/ahome-tooling-server-rpc'
+                description 'Ahome Tooling Server REST'
+                url 'https://github.com/ahome-it/ahome-tooling-server-rest'
                 scm {
-                    url 'scm:git@github.com:ahome-it/ahome-tooling-server-rpc.git'
-                    connection 'scm:git@github.com:ahome-it/ahome-tooling-server-rpc.git'
-                    developerConnection 'scm:git@github.com:ahome-it/ahome-tooling-server-rpc.git'
+                    url 'scm:git@github.com:ahome-it/ahome-tooling-server-rest.git'
+                    connection 'scm:git@github.com:ahome-it/ahome-tooling-server-rest.git'
+                    developerConnection 'scm:git@github.com:ahome-it/ahome-tooling-server-rest.git'
                 }
                 licenses {
                     license {

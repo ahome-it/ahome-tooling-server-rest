@@ -1,9 +1,9 @@
-Ahome Tooling Server RPC
+Ahome Tooling Server REST
 ======
 
-Ahome Tooling Server RPC is a package containing basic server support for RESTful RPC
+Ahome Tooling Server REST is a package containing basic server support for RESTful HTTP calls
 
-https://github.com/ahome-it/ahome-tooling-server-rpc
+https://github.com/ahome-it/ahome-tooling-server-rest
 
 Downloading artifacts
 
@@ -13,19 +13,19 @@ Maven:
 ```xml
 <dependency>
   <groupId>com.ahome-it</groupId>
-  <artifactId>ahome-tooling-server-rpc</artifactId>
-  <version>1.0.133-SNAPSHOT</version>
+  <artifactId>ahome-tooling-server-rest</artifactId>
+  <version>1.0.134-SNAPSHOT</version>
 </dependency>
 ```
 Gradle:
 ```
 dependencies {
-    compile(group:'com.ahome-it',name:'ahome-tooling-server-rpc',version:'1.0.133-SNAPSHOT')
+    compile(group:'com.ahome-it',name:'ahome-tooling-server-rest',version:'1.0.134-SNAPSHOT')
 }
 ```
 Javadoc URL:
 
-https://lienzo-core.com/documents/javadoc/ahome-tooling-server-rpc
+https://lienzo-core.com/documents/javadoc/ahome-tooling-server-rest
 
 License:
 
