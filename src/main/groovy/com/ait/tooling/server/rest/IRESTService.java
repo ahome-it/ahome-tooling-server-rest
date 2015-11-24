@@ -37,7 +37,7 @@ public interface IRESTService extends INamed, IRateLimited, Closeable
     
     public boolean isRequestTypeValid(RequestMethodType type);
     
-    public RequestMethodType getRequestMethodType();
+    public RequestMethodType[] getRequestMethodTypes();
     
     public JSONObject getSwaggerAttributes();
 }

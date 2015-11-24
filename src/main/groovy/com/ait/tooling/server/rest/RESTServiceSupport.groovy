@@ -89,7 +89,7 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     }
 
     @Memoized
-    public RequestMethodType getRequestMethodType()
+    public RequestMethodType[] getRequestMethodTypes()
     {
         final Class<?> claz = getClass()
 
@@ -101,13 +101,13 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
         {
             return claz.getAnnotation(RESTSpecification).requestType()
         }
-        RequestMethodType.getDefaultRequestMethodType()
+        RequestMethodType.getDefaultRequestMethodTypes()
     }
 
     @Memoized
     public boolean isRequestTypeValid(RequestMethodType type)
     {
-        getRequestMethodType() == type
+        getRequestMethodTypes().contains(type)
     }
 
     @Override
@@ -131,6 +131,6 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     @Override
     public JSONObject getSwaggerAttributes()
     {
-        json(path: getRequestBinding() ?: fixRequestBinding(getName()), method: getRequestMethodType().toString(), schemas: getSchemas())
+        json(path: getRequestBinding() ?: fixRequestBinding(getName()), methods: getRequestMethodTypes(), schemas: getSchemas())
     }
 }

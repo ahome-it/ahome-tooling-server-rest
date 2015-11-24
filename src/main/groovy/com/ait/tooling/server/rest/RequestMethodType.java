@@ -46,8 +46,8 @@ public enum RequestMethodType implements IStringValued
         return new RequestMethodType[] {POST, GET, PUT, DELETE};
     }
     
-    public static final RequestMethodType getDefaultRequestMethodType()
+    public static final RequestMethodType[] getDefaultRequestMethodTypes()
     {
-        return GET;
+        return new RequestMethodType[] {POST, GET};
     }
 }
