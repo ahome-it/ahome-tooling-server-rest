@@ -30,14 +30,14 @@ public interface IRESTService extends INamed, IRateLimited, Closeable
     public JSONObject execute(IRESTRequestContext context, JSONObject object) throws Exception;
 
     public JSONObject getSchemas();
-    
+
     public JSONSchema getRequestSchema();
 
     public JSONSchema getResponseSchema();
-    
+
     public boolean isRequestTypeValid(RequestMethodType type);
-    
-    public RequestMethodType[] getRequestMethodTypes();
-    
+
+    public RequestMethodType getRequestMethodType();
+
     public JSONObject getSwaggerAttributes();
 }

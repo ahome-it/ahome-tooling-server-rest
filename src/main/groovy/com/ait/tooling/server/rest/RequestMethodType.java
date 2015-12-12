@@ -40,14 +40,14 @@ public enum RequestMethodType implements IStringValued
     {
         return super.toString();
     }
-    
+
     public static final RequestMethodType[] getListOfRequestMethodTypes()
     {
-        return new RequestMethodType[] {POST, GET, PUT, DELETE};
+        return new RequestMethodType[] { POST, GET, PUT, DELETE };
     }
-    
-    public static final RequestMethodType[] getDefaultRequestMethodTypes()
+
+    public static final RequestMethodType getDefaultRequestMethodType()
     {
-        return new RequestMethodType[] {POST, GET};
+        return RequestMethodType.GET;
     }
 }

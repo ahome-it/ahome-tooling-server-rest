@@ -25,5 +25,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestMethod
 {
-    public RequestMethodType[] value() default {RequestMethodType.GET, RequestMethodType.POST};
+    public RequestMethodType value() default RequestMethodType.GET;
 }
