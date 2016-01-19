@@ -26,7 +26,7 @@ import com.ait.tooling.server.rest.*
 @Service
 @CompileStatic
 @RequestMethod(RequestMethodType.GET)
-@RequestBinding('/system/service/paths')
+@RequestBinding('/system/services/paths')
 public class GetServicePaths extends RESTServiceSupport
 {
     @Override

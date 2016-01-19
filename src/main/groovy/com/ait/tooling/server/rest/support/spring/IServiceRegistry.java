@@ -17,12 +17,11 @@
 package com.ait.tooling.server.rest.support.spring;
 
 import java.io.Closeable;
-import java.io.Serializable;
 import java.util.List;
 
 import com.ait.tooling.server.rest.IRESTService;
 
-public interface IServiceRegistry extends Serializable, Closeable
+public interface IServiceRegistry extends Closeable
 {
     public IRESTService getService(String name);
 

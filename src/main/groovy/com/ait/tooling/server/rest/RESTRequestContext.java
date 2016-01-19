@@ -32,15 +32,13 @@ import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
 
 public class RESTRequestContext implements IRESTRequestContext
 {
-    private static final long         serialVersionUID = -1336953145524645090L;
-
     private boolean                   m_closed;
 
     private final String              m_userid;
 
     private final String              m_sessid;
 
-    private final RequestMethodType         m_reqtyp;
+    private final RequestMethodType   m_reqtyp;
 
     private final boolean             m_admin;
 

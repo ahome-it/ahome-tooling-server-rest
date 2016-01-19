@@ -39,13 +39,11 @@ import com.ait.tooling.server.rest.IRESTService;
 @ManagedResource
 public class ServiceRegistry implements IServiceRegistry, BeanFactoryAware
 {
-    private static final long                         serialVersionUID = -8612763973722004339L;
+    private static final Logger                       logger     = Logger.getLogger(ServiceRegistry.class);
 
-    private static final Logger                       logger           = Logger.getLogger(ServiceRegistry.class);
+    private final LinkedHashMap<String, IRESTService> m_services = new LinkedHashMap<String, IRESTService>();
 
-    private final LinkedHashMap<String, IRESTService> m_services       = new LinkedHashMap<String, IRESTService>();
-
-    private final LinkedHashMap<String, IRESTService> m_bindings       = new LinkedHashMap<String, IRESTService>();
+    private final LinkedHashMap<String, IRESTService> m_bindings = new LinkedHashMap<String, IRESTService>();
 
     public ServiceRegistry()
     {

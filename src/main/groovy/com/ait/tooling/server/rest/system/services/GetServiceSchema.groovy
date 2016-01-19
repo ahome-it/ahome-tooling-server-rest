@@ -20,20 +20,19 @@ import groovy.transform.CompileStatic
 
 import org.springframework.stereotype.Service
 
-import com.ait.tooling.common.api.java.util.StringOps
 import com.ait.tooling.server.core.json.JSONObject
 import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
 @RequestMethod(RequestMethodType.POST)
-@RequestBinding('/system/service/schema')
+@RequestBinding('/system/services/schema')
 public class GetServiceSchema extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        final IRESTService service = getService(StringOps.requireTrimOrNull(object.getAsString('service'), 'Field [service] missing, null, or empty in request'))
+        final IRESTService service = getService(object.getAsString('service'))
 
         if (service)
         {

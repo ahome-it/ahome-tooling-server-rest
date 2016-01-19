@@ -36,14 +36,6 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     public RESTServiceSupport()
     {
         m_ratelimit = RateLimiterFactory.create(getClass())
-
-        if (null == m_ratelimit)
-        {
-            if (getClass().isAnnotationPresent(RESTSpecification))
-            {
-                m_ratelimit = RateLimiterFactory.create(getClass().getAnnotation(RESTSpecification).rateLimit())
-            }
-        }
     }
 
     @Override
@@ -81,10 +73,6 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
         {
             return fixRequestBinding(StringOps.toTrimOrNull(claz.getAnnotation(RequestBinding).value()))
         }
-        if (claz.isAnnotationPresent(RESTSpecification))
-        {
-            return fixRequestBinding(StringOps.toTrimOrNull(claz.getAnnotation(RESTSpecification).requestBinding()))
-        }
         null
     }
 
@@ -96,10 +84,6 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
         if (claz.isAnnotationPresent(RequestMethod))
         {
             return claz.getAnnotation(RequestMethod).value()
-        }
-        if (claz.isAnnotationPresent(RESTSpecification))
-        {
-            return claz.getAnnotation(RESTSpecification).requestType()
         }
         RequestMethodType.getDefaultRequestMethodType()
     }

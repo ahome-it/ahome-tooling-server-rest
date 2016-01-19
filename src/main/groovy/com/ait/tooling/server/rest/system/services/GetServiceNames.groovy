@@ -26,7 +26,7 @@ import com.ait.tooling.server.rest.*
 @Service
 @CompileStatic
 @RequestMethod(RequestMethodType.GET)
-@RequestBinding('/system/service/names')
+@RequestBinding('/system/services/names')
 public class GetServiceNames extends RESTServiceSupport
 {
     @Override

@@ -14,20 +14,24 @@
  * limitations under the License.
  */
 
-package com.ait.tooling.server.rest;
+package com.ait.tooling.server.rest.system.services
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import groovy.transform.CompileStatic
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-public @interface RESTSpecification
+import org.springframework.stereotype.Service
+
+import com.ait.tooling.server.core.json.JSONObject
+import com.ait.tooling.server.rest.*
+
+@Service
+@CompileStatic
+@RequestMethod(RequestMethodType.GET)
+@RequestBinding('/system/services/build/descriptors')
+public class GetBuildDescriptors extends RESTServiceSupport
 {
-    public RequestMethodType requestType() default RequestMethodType.GET;
-
-    public String requestBinding() default "";
-
-    public double rateLimit() default 0d;
+    @Override
+    public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
+    {
+        getBuildDescriptorProvider().toJSONObject()
+    }
 }

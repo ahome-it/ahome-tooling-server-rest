@@ -21,13 +21,11 @@ import groovy.transform.CompileStatic
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.server.core.json.JSONObject
-import com.ait.tooling.server.rest.IRESTRequestContext
-import com.ait.tooling.server.rest.IRESTService
-import com.ait.tooling.server.rest.RESTServiceSupport
-import com.ait.tooling.server.rest.RequestBinding
+import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
+@RequestMethod(RequestMethodType.GET)
 @RequestBinding('/system/swagger/api')
 public class GetSwaggerAPI extends RESTServiceSupport
 {

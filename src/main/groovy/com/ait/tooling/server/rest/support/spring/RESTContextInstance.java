@@ -25,9 +25,7 @@ import com.ait.tooling.server.rest.IRESTService;
 
 public class RESTContextInstance extends ServerContextInstance implements IRESTContext
 {
-    private static final long                serialVersionUID = 4505110067047624617L;
-
-    private static final RESTContextInstance INSTANCE         = new RESTContextInstance();
+    private static final RESTContextInstance INSTANCE = new RESTContextInstance();
 
     public static final RESTContextInstance getRESTContextInstance()
     {

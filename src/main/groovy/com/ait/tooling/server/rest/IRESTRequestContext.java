@@ -16,7 +16,6 @@
 
 package com.ait.tooling.server.rest;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.servlet.ServletContext;
@@ -26,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 
-public interface IRESTRequestContext extends Serializable
+public interface IRESTRequestContext
 {
     public JSONObject getJSONHeaders();
 
@@ -61,8 +60,8 @@ public interface IRESTRequestContext extends Serializable
     public boolean isPut();
 
     public void setCookie(String name, String value);
-    
+
     public void close();
-    
+
     public boolean isClosed();
 }
