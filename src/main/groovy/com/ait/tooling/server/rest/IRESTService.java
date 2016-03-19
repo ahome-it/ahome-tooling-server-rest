@@ -18,6 +18,8 @@ package com.ait.tooling.server.rest;
 
 import java.io.Closeable;
 
+import org.springframework.http.HttpMethod;
+
 import com.ait.tooling.common.api.types.INamed;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.json.schema.JSONSchema;
@@ -35,9 +37,7 @@ public interface IRESTService extends INamed, IRateLimited, Closeable
 
     public JSONSchema getResponseSchema();
 
-    public boolean isRequestTypeValid(RequestMethodType type);
-
-    public RequestMethodType getRequestMethodType();
+    public HttpMethod getRequestMethodType();
 
     public JSONObject getSwaggerAttributes();
 }

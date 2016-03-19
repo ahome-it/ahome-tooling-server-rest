@@ -18,6 +18,7 @@ package com.ait.tooling.server.rest.system.services
 
 import groovy.transform.CompileStatic
 
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.server.core.json.JSONObject
@@ -25,7 +26,7 @@ import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
-@RequestMethod(RequestMethodType.GET)
+@RequestMethod(HttpMethod.GET)
 @RequestBinding('/system/services/paths')
 public class GetServicePaths extends RESTServiceSupport
 {

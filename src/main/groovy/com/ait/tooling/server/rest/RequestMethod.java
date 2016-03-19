@@ -21,9 +21,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import org.springframework.http.HttpMethod;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface RequestMethod
 {
-    public RequestMethodType value() default RequestMethodType.GET;
+    public HttpMethod value() default HttpMethod.GET;
 }

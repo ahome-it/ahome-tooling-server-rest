@@ -19,6 +19,7 @@ package com.ait.tooling.server.rest
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 
+import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 
 import com.ait.tooling.common.api.java.util.StringOps
@@ -77,7 +78,7 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     }
 
     @Memoized
-    public RequestMethodType getRequestMethodType()
+    public HttpMethod getRequestMethodType()
     {
         final Class<?> claz = getClass()
 
@@ -85,13 +86,7 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
         {
             return claz.getAnnotation(RequestMethod).value()
         }
-        RequestMethodType.getDefaultRequestMethodType()
-    }
-
-    @Memoized
-    public boolean isRequestTypeValid(RequestMethodType type)
-    {
-        getRequestMethodType() == type;
+        HttpMethod.GET
     }
 
     @Override

@@ -22,6 +22,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpMethod;
+
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 
@@ -31,7 +33,7 @@ public interface IRESTRequestContext
 
     public JSONObject getJSONParameters();
 
-    public RequestMethodType getRequestType();
+    public HttpMethod getRequestType();
 
     public IRESTContext getRESTContext();
 

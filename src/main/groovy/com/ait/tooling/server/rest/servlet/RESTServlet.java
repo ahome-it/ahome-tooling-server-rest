@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.springframework.http.HttpMethod;
 
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.common.api.java.util.UUID;
@@ -38,7 +39,6 @@ import com.ait.tooling.server.core.security.session.IServerSessionRepository;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.rest.IRESTService;
 import com.ait.tooling.server.rest.RESTRequestContext;
-import com.ait.tooling.server.rest.RequestMethodType;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
 
@@ -70,28 +70,28 @@ public class RESTServlet extends HTTPServletBase
     @Override
     public void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, false, RequestMethodType.GET, getJSONParametersFromRequest(request));
+        doService(request, response, false, HttpMethod.GET, getJSONParametersFromRequest(request));
     }
 
     @Override
     public void doPut(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestMethodType.PUT, null);
+        doService(request, response, true, HttpMethod.PUT, null);
     }
 
     @Override
     public void doPost(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestMethodType.POST, null);
+        doService(request, response, true, HttpMethod.POST, null);
     }
 
     @Override
     public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, RequestMethodType.DELETE, null);
+        doService(request, response, true, HttpMethod.DELETE, null);
     }
 
-    protected void doService(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final RequestMethodType type, JSONObject object) throws ServletException, IOException
+    protected void doService(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final HttpMethod type, JSONObject object) throws ServletException, IOException
     {
         if (false == isRunning())
         {
@@ -177,7 +177,7 @@ public class RESTServlet extends HTTPServletBase
                 return;
             }
         }
-        if (false == service.isRequestTypeValid(type))
+        if (type != service.getRequestMethodType())
         {
             logger.error("service " + name + " not type " + type);
 
@@ -320,7 +320,7 @@ public class RESTServlet extends HTTPServletBase
         return false;
     }
 
-    protected JSONObject parseJSON(final HttpServletRequest request, final RequestMethodType type)
+    protected JSONObject parseJSON(final HttpServletRequest request, final HttpMethod type)
     {
         JSONObject object = null;
 
@@ -341,24 +341,24 @@ public class RESTServlet extends HTTPServletBase
             }
             catch (JSONParserException e)
             {
-                if (type != RequestMethodType.POST)
+                if (type != HttpMethod.POST)
                 {
                     logger.error("JSONParserException", e);
                 }
             }
             catch (IOException e)
             {
-                if (type != RequestMethodType.POST)
+                if (type != HttpMethod.POST)
                 {
                     logger.error("IOException", e);
                 }
             }
         }
-        if ((null == object) && (type != RequestMethodType.POST))
+        if ((null == object) && (type != HttpMethod.POST))
         {
             object = new JSONObject();
         }
-        if (((null == object) || (leng == 0)) && (type == RequestMethodType.POST))
+        if (((null == object) || (leng == 0)) && (type == HttpMethod.POST))
         {
             logger.error("Empty body on POST");
         }
