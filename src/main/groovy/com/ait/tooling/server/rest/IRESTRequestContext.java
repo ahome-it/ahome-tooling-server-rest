@@ -25,10 +25,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 
 import com.ait.tooling.server.core.json.JSONObject;
+import com.ait.tooling.server.core.security.session.IServerSession;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 
 public interface IRESTRequestContext
 {
+    public IServerSession getSession();
+
     public JSONObject getJSONHeaders();
 
     public JSONObject getJSONParameters();
@@ -47,7 +50,7 @@ public interface IRESTRequestContext
 
     public String getUserID();
 
-    public List<String> getUserRoles();
+    public List<String> getRoles();
 
     public boolean isAdmin();
 

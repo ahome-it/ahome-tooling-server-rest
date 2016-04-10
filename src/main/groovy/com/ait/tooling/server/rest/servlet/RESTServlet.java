@@ -17,7 +17,8 @@
 package com.ait.tooling.server.rest.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -44,9 +45,11 @@ import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
 
 public class RESTServlet extends HTTPServletBase
 {
-    private static final long   serialVersionUID = 8890049936686095786L;
+    private static final long         serialVersionUID = 8890049936686095786L;
 
-    private static final Logger logger           = Logger.getLogger(RESTServlet.class);
+    private static final Logger       logger           = Logger.getLogger(RESTServlet.class);
+
+    private static final List<String> ANONYMOUS        = Collections.unmodifiableList(Arrays.asList("ANONYMOUS"));
 
     public RESTServlet()
     {
@@ -85,10 +88,15 @@ public class RESTServlet extends HTTPServletBase
         doService(request, response, true, HttpMethod.POST, null);
     }
 
+    public void doPatch(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
+    {
+        doService(request, response, true, HttpMethod.PATCH, null);
+    }
+
     @Override
     public void doDelete(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
     {
-        doService(request, response, true, HttpMethod.DELETE, null);
+        doService(request, response, false, HttpMethod.DELETE, new JSONObject());
     }
 
     protected void doService(final HttpServletRequest request, final HttpServletResponse response, final boolean read, final HttpMethod type, JSONObject object) throws ServletException, IOException
@@ -206,7 +214,9 @@ public class RESTServlet extends HTTPServletBase
                 return;
             }
         }
-        List<String> uroles = null;
+        IServerSession session = null;
+
+        List<String> uroles = ANONYMOUS;
 
         String userid = StringOps.toTrimOrNull(request.getHeader(X_USER_ID_HEADER));
 
@@ -220,21 +230,7 @@ public class RESTServlet extends HTTPServletBase
 
             if (null != repository)
             {
-                final IServerSession session = repository.getSession(sessid);
-
-                if ((null != session) && (false == session.isExpired()))
-                {
-                    uroles = session.getRoles();
-                }
-            }
-        }
-        else if (null != ctoken)
-        {
-            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
-
-            if (null != repository)
-            {
-                final IServerSession session = repository.createSession(new JSONObject(X_CLIENT_API_TOKEN_HEADER, ctoken));
+                session = repository.getSession(sessid);
 
                 if ((null != session) && (false == session.isExpired()))
                 {
@@ -244,11 +240,45 @@ public class RESTServlet extends HTTPServletBase
 
                     userid = StringOps.toTrimOrNull(session.getUserId());
                 }
+                else
+                {
+                    logger.error("unknown or expired session " + sessid);
+
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+                    return;
+                }
             }
         }
-        if (null == uroles)
+        else if (null != ctoken)
         {
-            uroles = new ArrayList<String>(0);
+            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
+
+            if (null != repository)
+            {
+                session = repository.createSession(new JSONObject(X_CLIENT_API_TOKEN_HEADER, ctoken));
+
+                if ((null != session) && (false == session.isExpired()))
+                {
+                    uroles = session.getRoles();
+
+                    sessid = StringOps.toTrimOrNull(session.getId());
+
+                    userid = StringOps.toTrimOrNull(session.getUserId());
+                }
+                else
+                {
+                    logger.error("unknown or expired token " + ctoken);
+
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+                    return;
+                }
+            }
+        }
+        if ((null == uroles) || (uroles.isEmpty()))
+        {
+            uroles = ANONYMOUS;
         }
         final AuthorizationResult resp = isAuthorized(service, uroles);
 
@@ -264,7 +294,7 @@ public class RESTServlet extends HTTPServletBase
 
             return;
         }
-        final RESTRequestContext context = new RESTRequestContext(userid, sessid, resp.isAdmin(), uroles, getServletContext(), request, response, type);
+        final RESTRequestContext context = new RESTRequestContext(session, userid, sessid, resp.isAdmin(), uroles, getServletContext(), request, response, type);
 
         try
         {
@@ -322,47 +352,68 @@ public class RESTServlet extends HTTPServletBase
 
     protected JSONObject parseJSON(final HttpServletRequest request, final HttpMethod type)
     {
-        JSONObject object = null;
-
-        final int leng = request.getContentLength();
-
-        if (leng > 0)
+        if (isMethodJSON(type))
         {
-            final JSONParser parser = new JSONParser();
+            JSONObject object = null;
 
-            try
+            final int leng = request.getContentLength();
+
+            if (leng > 0)
             {
-                final Object parsed = parser.parse(request.getReader());
+                final JSONParser parser = new JSONParser();
 
-                if (parsed instanceof JSONObject)
+                try
                 {
-                    object = ((JSONObject) parsed);
+                    final Object parsed = parser.parse(request.getReader());
+
+                    if (parsed instanceof JSONObject)
+                    {
+                        object = ((JSONObject) parsed);
+                    }
                 }
-            }
-            catch (JSONParserException e)
-            {
-                if (type != HttpMethod.POST)
+                catch (JSONParserException e)
                 {
                     logger.error("JSONParserException", e);
                 }
-            }
-            catch (IOException e)
-            {
-                if (type != HttpMethod.POST)
+                catch (IOException e)
                 {
                     logger.error("IOException", e);
                 }
             }
+            if (((null == object) || (leng == 0)))
+            {
+                logger.error("empty body on " + type.name());
+
+                object = new JSONObject();
+            }
+            return object;
         }
-        if ((null == object) && (type != HttpMethod.POST))
+        return new JSONObject();
+    }
+
+    private boolean isMethodJSON(final HttpMethod type)
+    {
+        if (type == HttpMethod.GET)
         {
-            object = new JSONObject();
+            return false;
         }
-        if (((null == object) || (leng == 0)) && (type == HttpMethod.POST))
+        if (type == HttpMethod.POST)
         {
-            logger.error("Empty body on POST");
+            return true;
         }
-        return object;
+        if (type == HttpMethod.PUT)
+        {
+            return true;
+        }
+        if (type == HttpMethod.PATCH)
+        {
+            return true;
+        }
+        if (type == HttpMethod.DELETE)
+        {
+            return false;
+        }
+        return false;
     }
 
     protected void writeJSON(final HttpServletResponse response, final JSONObject output) throws IOException
@@ -385,5 +436,17 @@ public class RESTServlet extends HTTPServletBase
     protected final IRESTContext getRESTContext()
     {
         return RESTContextInstance.getRESTContextInstance();
+    }
+
+    @Override
+    public void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException
+    {
+        if ("PATCH".equalsIgnoreCase(request.getMethod()))
+        {
+            doPatch(request, response);
+
+            return;
+        }
+        super.service(request, response);
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.http.HttpMethod;
 
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.server.core.json.JSONObject;
+import com.ait.tooling.server.core.security.session.IServerSession;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
@@ -46,13 +47,15 @@ public class RESTRequestContext implements IRESTRequestContext
 
     private final List<String>        m_roles;
 
+    private final IServerSession      m_session;
+
     private final ServletContext      m_servlet_context;
 
     private final HttpServletRequest  m_servlet_request;
 
     private final HttpServletResponse m_servlet_response;
 
-    public RESTRequestContext(String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response, HttpMethod reqtyp)
+    public RESTRequestContext(IServerSession session, String userid, String sessid, boolean admin, List<String> roles, ServletContext context, HttpServletRequest request, HttpServletResponse response, HttpMethod reqtyp)
     {
         m_closed = false;
 
@@ -63,6 +66,8 @@ public class RESTRequestContext implements IRESTRequestContext
         m_sessid = sessid;
 
         m_admin = admin;
+
+        m_session = session;
 
         m_roles = Collections.unmodifiableList(roles);
 
@@ -142,12 +147,34 @@ public class RESTRequestContext implements IRESTRequestContext
     @Override
     public String getSessionID()
     {
+        final IServerSession sess = getSession();
+
+        if (null != sess)
+        {
+            String valu = sess.getId();
+
+            if (null != valu)
+            {
+                return valu;
+            }
+        }
         return m_sessid;
     }
 
     @Override
     public String getUserID()
     {
+        final IServerSession sess = getSession();
+
+        if (null != sess)
+        {
+            String valu = sess.getUserId();
+
+            if (null != valu)
+            {
+                return valu;
+            }
+        }
         return m_userid;
     }
 
@@ -210,8 +237,19 @@ public class RESTRequestContext implements IRESTRequestContext
     }
 
     @Override
-    public List<String> getUserRoles()
+    public List<String> getRoles()
     {
+        final IServerSession sess = getSession();
+
+        if (null != sess)
+        {
+            List<String> valu = sess.getRoles();
+
+            if ((null != valu) && (false == valu.isEmpty()))
+            {
+                return Collections.unmodifiableList(valu);
+            }
+        }
         return m_roles;
     }
 
@@ -225,5 +263,11 @@ public class RESTRequestContext implements IRESTRequestContext
     public boolean isClosed()
     {
         return m_closed;
+    }
+
+    @Override
+    public IServerSession getSession()
+    {
+        return m_session;
     }
 }
