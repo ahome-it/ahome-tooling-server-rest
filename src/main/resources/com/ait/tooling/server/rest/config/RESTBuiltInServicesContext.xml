@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
 /*
  * Copyright (c) 2014,2015,2016 Ahome' Innovation Technologies. All rights reserved.
  *
@@ -13,26 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context.xsd">
 
-package com.ait.tooling.server.rest.system.services
+	<context:component-scan base-package="com.ait.tooling.server.rest.system.builtin.services"/>
 
-import groovy.transform.CompileStatic
-
-import org.springframework.http.HttpMethod
-import org.springframework.stereotype.Service
-
-import com.ait.tooling.server.core.json.JSONObject
-import com.ait.tooling.server.rest.*
-
-@Service
-@CompileStatic
-@RequestMethod(HttpMethod.GET)
-@RequestBinding('/system/services/paths')
-public class GetServicePaths extends RESTServiceSupport
-{
-    @Override
-    public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
-    {
-        json(paths: getServiceRegistry().getRequestBindings())
-    }
-}
+</beans>

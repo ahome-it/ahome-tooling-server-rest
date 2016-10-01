@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ait.tooling.server.rest.system.services
+package com.ait.tooling.server.rest.system.builtin.services
 
 import groovy.transform.CompileStatic
 
@@ -27,21 +27,12 @@ import com.ait.tooling.server.rest.*
 @Service
 @CompileStatic
 @RequestMethod(HttpMethod.GET)
-@RequestBinding('/system/swagger/api')
-public class GetSwaggerAPI extends RESTServiceSupport
+@RequestBinding('/builtin/system/services/paths')
+public class GetServicePathsService extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        final List list = []
-
-        getServices().each { IRESTService service ->
-
-            if (service)
-            {
-                list << service.getSwaggerAttributes()
-            }
-        }
-        json(swagger: '2.0', links: list)
+        json(paths: getServiceRegistry().getRequestBindings())
     }
 }

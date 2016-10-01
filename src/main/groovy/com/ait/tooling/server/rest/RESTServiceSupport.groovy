@@ -19,6 +19,8 @@ package com.ait.tooling.server.rest
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 
+import javax.servlet.http.HttpServletResponse
+
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Service
 
@@ -111,5 +113,15 @@ public abstract class RESTServiceSupport extends RESTSupport implements IRESTSer
     public JSONObject getSwaggerAttributes()
     {
         json(path: getRequestBinding() ?: fixRequestBinding(getName()), method: getRequestMethodType(), schemas: getSchemas())
+    }
+    
+    protected JSONObject failure(final String reason, final int code) throws RESTException
+    {
+        throw new RESTException(reason, code)
+    }
+    
+    protected JSONObject failure(final String reason) throws RESTException
+    {
+        failure(reason, HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
     }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ait.tooling.server.rest.system.services
+package com.ait.tooling.server.rest.system.builtin.services
 
 import groovy.transform.CompileStatic
 
@@ -27,8 +27,8 @@ import com.ait.tooling.server.rest.*
 @Service
 @CompileStatic
 @RequestMethod(HttpMethod.GET)
-@RequestBinding('/system/services/build/descriptors')
-public class GetBuildDescriptors extends RESTServiceSupport
+@RequestBinding('/builtin/system/services/build/descriptors')
+public class GetBuildDescriptorsService extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception

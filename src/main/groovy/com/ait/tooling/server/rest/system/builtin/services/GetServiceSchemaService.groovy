@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.ait.tooling.server.rest.system.services
+package com.ait.tooling.server.rest.system.builtin.services
 
 import groovy.transform.CompileStatic
 
@@ -26,13 +26,19 @@ import com.ait.tooling.server.rest.*
 
 @Service
 @CompileStatic
-@RequestMethod(HttpMethod.GET)
-@RequestBinding('/system/services/names')
-public class GetServiceNames extends RESTServiceSupport
+@RequestMethod(HttpMethod.POST)
+@RequestBinding('/builtin/system/services/schema')
+public class GetServiceSchemaService extends RESTServiceSupport
 {
     @Override
     public JSONObject execute(final IRESTRequestContext context, final JSONObject object) throws Exception
     {
-        json(names: getServiceRegistry().getServiceNames())
+        final IRESTService service = getService(object.getAsString('service'))
+
+        if (service)
+        {
+            return json(schemas: service.getSchemas())
+        }
+        failure('service not found ' + object.getAsString('service'))
     }
 }

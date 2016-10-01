@@ -43,6 +43,4 @@
 
 	<bean id="RESTServiceRegistry" class="com.ait.tooling.server.rest.support.spring.ServiceRegistry" destroy-method="close"/>
 
-	<context:component-scan base-package="com.ait.tooling.server.rest.system.services"/>
-
 </beans>

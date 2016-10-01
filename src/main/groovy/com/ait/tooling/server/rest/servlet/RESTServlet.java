@@ -17,8 +17,6 @@
 package com.ait.tooling.server.rest.servlet;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -29,27 +27,26 @@ import org.apache.log4j.Logger;
 import org.springframework.http.HttpMethod;
 
 import com.ait.tooling.common.api.java.util.StringOps;
-import com.ait.tooling.common.api.java.util.UUID;
 import com.ait.tooling.common.server.io.NoSyncBufferedWriter;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.json.parser.JSONParser;
 import com.ait.tooling.server.core.json.parser.JSONParserException;
 import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.security.session.IServerSession;
+import com.ait.tooling.server.core.security.session.IServerSessionHelper;
 import com.ait.tooling.server.core.security.session.IServerSessionRepository;
 import com.ait.tooling.server.core.servlet.HTTPServletBase;
 import com.ait.tooling.server.rest.IRESTService;
+import com.ait.tooling.server.rest.RESTException;
 import com.ait.tooling.server.rest.RESTRequestContext;
 import com.ait.tooling.server.rest.support.spring.IRESTContext;
 import com.ait.tooling.server.rest.support.spring.RESTContextInstance;
 
 public class RESTServlet extends HTTPServletBase
 {
-    private static final long         serialVersionUID = 8890049936686095786L;
+    private static final long   serialVersionUID = 8890049936686095786L;
 
-    private static final Logger       logger           = Logger.getLogger(RESTServlet.class);
-
-    private static final List<String> ANONYMOUS        = Collections.unmodifiableList(Arrays.asList("ANONYMOUS"));
+    private static final Logger logger           = Logger.getLogger(RESTServlet.class);
 
     public RESTServlet()
     {
@@ -216,7 +213,7 @@ public class RESTServlet extends HTTPServletBase
         }
         IServerSession session = null;
 
-        List<String> uroles = ANONYMOUS;
+        List<String> uroles = IServerSessionHelper.SP_DEFAULT_ROLES_LIST;
 
         String userid = StringOps.toTrimOrNull(request.getHeader(X_USER_ID_HEADER));
 
@@ -224,61 +221,81 @@ public class RESTServlet extends HTTPServletBase
 
         String ctoken = StringOps.toTrimOrNull(request.getHeader(X_CLIENT_API_TOKEN_HEADER));
 
+        String strict = StringOps.toTrimOrNull(request.getHeader(X_STRICT_JSON_FORMAT_HEADER));
+
         if (null != sessid)
         {
-            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
+            final IServerSessionRepository repository = getRESTContext().getServerSessionRepository(getSessionProviderDomainName());
 
             if (null != repository)
             {
                 session = repository.getSession(sessid);
 
-                if ((null != session) && (false == session.isExpired()))
+                if (null == session)
                 {
-                    uroles = session.getRoles();
+                    logger.error("unknown session " + sessid);
 
-                    sessid = StringOps.toTrimOrNull(session.getId());
-
-                    userid = StringOps.toTrimOrNull(session.getUserId());
-                }
-                else
-                {
-                    logger.error("unknown or expired session " + sessid);
+                    response.addHeader(WWW_AUTHENTICATE, "unknown session " + sessid);
 
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
                     return;
                 }
+                if (session.isExpired())
+                {
+                    logger.error("expired session " + sessid);
+
+                    response.addHeader(WWW_AUTHENTICATE, "expired session " + sessid);
+
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+                    return;
+                }
+                uroles = session.getRoles();
+
+                sessid = StringOps.toTrimOrElse(session.getId(), sessid);
+
+                userid = StringOps.toTrimOrElse(session.getUserId(), userid);
             }
         }
         else if (null != ctoken)
         {
-            final IServerSessionRepository repository = getServerContext().getServerSessionRepository(getSessionProviderDomainName());
+            final IServerSessionRepository repository = getRESTContext().getServerSessionRepository(getSessionProviderDomainName());
 
             if (null != repository)
             {
                 session = repository.createSession(new JSONObject(X_CLIENT_API_TOKEN_HEADER, ctoken));
 
-                if ((null != session) && (false == session.isExpired()))
+                if (null == session)
                 {
-                    uroles = session.getRoles();
+                    logger.error("unknown token " + ctoken);
 
-                    sessid = StringOps.toTrimOrNull(session.getId());
-
-                    userid = StringOps.toTrimOrNull(session.getUserId());
-                }
-                else
-                {
-                    logger.error("unknown or expired token " + ctoken);
+                    response.addHeader(WWW_AUTHENTICATE, "unknown token " + ctoken);
 
                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
                     return;
                 }
+                if (session.isExpired())
+                {
+                    logger.error("expired session " + sessid);
+
+                    response.addHeader(WWW_AUTHENTICATE, "expired session " + sessid);
+
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+
+                    return;
+                }
+                uroles = session.getRoles();
+
+                sessid = StringOps.toTrimOrElse(session.getId(), sessid);
+
+                userid = StringOps.toTrimOrElse(session.getUserId(), userid);
             }
         }
         if ((null == uroles) || (uroles.isEmpty()))
         {
-            uroles = ANONYMOUS;
+            uroles = IServerSessionHelper.SP_DEFAULT_ROLES_LIST;
         }
         final AuthorizationResult resp = isAuthorized(service, uroles);
 
@@ -290,6 +307,8 @@ public class RESTServlet extends HTTPServletBase
             }
             logger.error("service authorization failed " + name + " for user " + userid + " code " + resp.getText());
 
+            response.addHeader(WWW_AUTHENTICATE, "unauthorized " + resp.getText());
+
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
             return;
@@ -298,9 +317,9 @@ public class RESTServlet extends HTTPServletBase
 
         try
         {
-            final long tick = System.currentTimeMillis();
-
             final long time = System.nanoTime();
+
+            final long tick = System.currentTimeMillis();
 
             service.acquire();
 
@@ -322,27 +341,43 @@ public class RESTServlet extends HTTPServletBase
             {
                 if (irpc)
                 {
-                    writeJSON(response, new JSONObject("result", result));
+                    writeJSON(HttpServletResponse.SC_OK, response, new JSONObject("result", result), isStrict(strict));
                 }
                 else
                 {
-                    writeJSON(response, result);
+                    writeJSON(HttpServletResponse.SC_OK, response, result, isStrict(strict));
                 }
+            }
+        }
+        catch (RESTException e)
+        {
+            if (false == context.isClosed())
+            {
+                writeJSON(e.getCode(), response, new JSONObject("error", new JSONObject("code", e.getCode()).set("reason", e.getReason())), isStrict(strict));
             }
         }
         catch (Throwable e)
         {
-            final String uuid = UUID.uuid();
+            final String oops = "calling " + name + " error uuid " + getRESTContext().uuid();
 
-            logger.error("calling service " + name + " ERROR UUID=" + uuid, e);
+            logger.error(oops, e);
 
             if (false == context.isClosed())
             {
-                final JSONObject output = new JSONObject("error", "A severe error occured with UUID=" + uuid + " , Please contact support.");
-
-                writeJSON(response, output);
+                writeJSON(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, response, new JSONObject("error", new JSONObject("code", HttpServletResponse.SC_INTERNAL_SERVER_ERROR).set("reason", oops)), isStrict(strict));
             }
         }
+    }
+
+    protected boolean isStrict(String strict)
+    {
+        strict = StringOps.toTrimOrNull(strict);
+
+        if ((null != strict) && ("true".equalsIgnoreCase(strict)))
+        {
+            return true;
+        }
+        return false;
     }
 
     protected boolean isCommandInBody()
@@ -354,8 +389,6 @@ public class RESTServlet extends HTTPServletBase
     {
         if (isMethodJSON(type))
         {
-            JSONObject object = null;
-
             final int leng = request.getContentLength();
 
             if (leng > 0)
@@ -364,29 +397,27 @@ public class RESTServlet extends HTTPServletBase
 
                 try
                 {
-                    final Object parsed = parser.parse(request.getReader());
-
-                    if (parsed instanceof JSONObject)
-                    {
-                        object = ((JSONObject) parsed);
-                    }
+                    return parser.parse(request.getReader());
                 }
                 catch (JSONParserException e)
                 {
                     logger.error("JSONParserException", e);
+
+                    return null;
                 }
                 catch (IOException e)
                 {
                     logger.error("IOException", e);
+
+                    return null;
                 }
             }
-            if (((null == object) || (leng == 0)))
+            if (leng == 0)
             {
                 logger.error("empty body on " + type.name());
 
-                object = new JSONObject();
+                return new JSONObject();
             }
-            return object;
         }
         return new JSONObject();
     }
@@ -416,11 +447,13 @@ public class RESTServlet extends HTTPServletBase
         return false;
     }
 
-    protected void writeJSON(final HttpServletResponse response, final JSONObject output) throws IOException
+    protected void writeJSON(final int code, final HttpServletResponse response, final JSONObject output, final boolean strict) throws IOException
     {
+        //UriComponentsBuilder.fromPath("/path/{id}").
+
         doNoCache(response);
 
-        response.setStatus(HttpServletResponse.SC_OK);
+        response.setStatus(code);
 
         response.setContentType(CONTENT_TYPE_APPLICATION_JSON);
 
@@ -428,7 +461,7 @@ public class RESTServlet extends HTTPServletBase
 
         final NoSyncBufferedWriter buff = new NoSyncBufferedWriter(response.getWriter(), 1024);
 
-        output.writeJSONString(buff, true);
+        output.writeJSONString(buff, strict);
 
         buff.flush();
     }
