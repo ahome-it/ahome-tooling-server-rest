@@ -29,7 +29,7 @@ https://lienzo-core.com/documents/javadoc/ahome-tooling-server-rest
 
 License:
 
-Copyright (c) 2014,2015,2016 Ahome Innovation Technologies. All rights reserved.
+Copyright (c) 2017 Ahome Innovation Technologies. All rights reserved.
 
 Ahome Tooling Server RPC is released under version 2.0 of the Apache License.
 
