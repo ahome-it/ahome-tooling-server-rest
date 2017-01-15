@@ -29,8 +29,8 @@ import org.springframework.http.HttpMethod;
 import com.ait.tooling.common.api.java.util.StringOps;
 import com.ait.tooling.common.server.io.NoSyncBufferedWriter;
 import com.ait.tooling.server.core.json.JSONObject;
+import com.ait.tooling.server.core.json.ParserException;
 import com.ait.tooling.server.core.json.parser.JSONParser;
-import com.ait.tooling.server.core.json.parser.JSONParserException;
 import com.ait.tooling.server.core.security.AuthorizationResult;
 import com.ait.tooling.server.core.security.session.IServerSession;
 import com.ait.tooling.server.core.security.session.IServerSessionHelper;
@@ -399,9 +399,9 @@ public class RESTServlet extends HTTPServletBase
                 {
                     return parser.parse(request.getReader());
                 }
-                catch (JSONParserException e)
+                catch (ParserException e)
                 {
-                    logger.error("JSONParserException", e);
+                    logger.error("ParserException", e);
 
                     return null;
                 }
