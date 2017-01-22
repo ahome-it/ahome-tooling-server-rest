@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.springframework.http.HttpMethod;
 
 import com.ait.tooling.common.api.java.util.StringOps;
-import com.ait.tooling.common.server.io.NoSyncBufferedWriter;
+import com.ait.tooling.server.core.io.NoSyncBufferedWriter;
 import com.ait.tooling.server.core.json.JSONObject;
 import com.ait.tooling.server.core.json.ParserException;
 import com.ait.tooling.server.core.json.parser.JSONParser;
@@ -397,7 +397,7 @@ public class RESTServlet extends HTTPServletBase
 
                 try
                 {
-                    return parser.parse(request.getReader());
+                    return parser.parse(request.getInputStream());
                 }
                 catch (ParserException e)
                 {
