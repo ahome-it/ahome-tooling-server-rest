@@ -449,8 +449,6 @@ public class RESTServlet extends HTTPServletBase
 
     protected void writeJSON(final int code, final HttpServletResponse response, final JSONObject output, final boolean strict) throws IOException
     {
-        //UriComponentsBuilder.fromPath("/path/{id}").
-
         doNoCache(response);
 
         response.setStatus(code);
